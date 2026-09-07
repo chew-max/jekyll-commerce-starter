@@ -1,0 +1,92 @@
+<footer class="site-footer">
+  <div class="page-width">
+
+    <div class="site-footer__grid">
+
+      <div class="site-footer__brand">
+        <h2>{{ site.data.store.brand.name }}</h2>
+        <p>{{ site.data.store.brand.tagline }}</p>
+      </div>
+
+      <div class="site-footer__column">
+        <h3>Shop</h3>
+
+        <ul>
+          <li>
+            <a href="{{ '/shop/' | relative_url }}">All Products</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="site-footer__column">
+        <h3>Information</h3>
+
+        <ul>
+          <li>
+            <a href="{{ '/about/' | relative_url }}">About</a>
+          </li>
+
+          <li>
+            <a href="{{ '/contact/' | relative_url }}">Contact</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="site-footer__column">
+        <h3>Follow</h3>
+
+        <ul>
+          {% if site.data.store.social.instagram != "" %}
+            <li>
+              <a
+                href="{{ site.data.store.social.instagram }}"
+                target="_blank"
+                rel="noopener"
+              >
+                Instagram
+              </a>
+            </li>
+          {% endif %}
+
+          {% if site.data.store.social.facebook != "" %}
+            <li>
+              <a
+                href="{{ site.data.store.social.facebook }}"
+                target="_blank"
+                rel="noopener"
+              >
+                Facebook
+              </a>
+            </li>
+          {% endif %}
+
+          {% if site.data.store.social.tiktok != "" %}
+            <li>
+              <a
+                href="{{ site.data.store.social.tiktok }}"
+                target="_blank"
+                rel="noopener"
+              >
+                TikTok
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>
+        &copy; {{ "now" | date: "%Y" }}
+        {{ site.data.store.brand.name }}.
+        All rights reserved.
+      </p>
+
+      <p class="site-footer__powered">
+        Powered by Jekyll.
+      </p>
+    </div>
+
+  </div>
+</footer>
