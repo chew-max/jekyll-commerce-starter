@@ -4,6 +4,8 @@ layout: product
 title: "Weekend Warrior Tee"
 slug: weekend-warrior-tee
 
+product_id: "WWT-001"
+
 price: 24.99
 compare_at_price: 29.99
 
@@ -29,8 +31,6 @@ variants:
     - XL
     - 2XL
     - 3XL
-	
-product_id: "WWT-001"
 
 variant_skus:
   Black:
@@ -56,7 +56,7 @@ variant_skus:
     XL: "WWT-HGR-XL"
     2XL: "WWT-HGR-2XL"
     3XL: "WWT-HGR-3XL"
-	
+
 short_description: >
   A clean everyday tee built for weekend projects,
   honey-do lists, and getting the job done.
