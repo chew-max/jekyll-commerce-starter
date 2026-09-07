@@ -26,5 +26,5 @@ social:
   tiktok: ""
   
 commerce:
-  checkout_endpoint: "https://jekyll-commerce-api.mth-commerce.workers.dev"
   provider: "global-payments"
+  checkout_endpoint: "https://jekyll-commerce-api.mth-commerce.workers.dev/api/checkout"
