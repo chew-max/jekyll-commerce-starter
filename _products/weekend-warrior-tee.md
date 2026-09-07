@@ -13,8 +13,8 @@ badge: "Best Seller"
 collection: diy
 
 images:
-  - /assets/images/products/weekend-warrior/front.jpg
-  - /assets/images/products/weekend-warrior/back.jpg
+  - /assets/images/products/weekend-warrior/front.png
+  - /assets/images/products/weekend-warrior/back.png
 
 variants:
   colors:
