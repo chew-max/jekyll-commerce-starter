@@ -415,16 +415,21 @@ document.addEventListener("DOMContentLoaded", function () {
           });
 
 
-        if (existingItem) {
+		if (existingItem) {
 
-          existingItem.quantity +=
-            product.quantity;
+		  existingItem.quantity += product.quantity;
 
-        } else {
+		  // Keep existing cart data synced with current product data
+		  existingItem.title = product.title;
+		  existingItem.price = product.price;
+		  existingItem.image = product.image;
+		  existingItem.url = product.url;
 
-          cart.push(product);
+		} else {
 
-        }
+		  cart.push(product);
+
+}
 
 
         saveCart(cart);
