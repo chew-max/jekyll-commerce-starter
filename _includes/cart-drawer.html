@@ -1,0 +1,68 @@
+<div
+  class="cart-overlay"
+  id="cart-overlay"
+  hidden
+></div>
+
+<aside
+  class="cart-drawer"
+  id="cart-drawer"
+  aria-hidden="true"
+  aria-labelledby="cart-drawer-title"
+>
+  <div class="cart-drawer__header">
+
+    <h2 id="cart-drawer-title">
+      Your Cart
+    </h2>
+
+    <button
+      type="button"
+      class="cart-drawer__close"
+      id="cart-drawer-close"
+      aria-label="Close cart"
+    >
+      ×
+    </button>
+
+  </div>
+
+  <div
+    class="cart-drawer__items"
+    id="cart-items"
+  ></div>
+
+  <div
+    class="cart-drawer__empty"
+    id="cart-empty"
+  >
+    Your cart is empty.
+  </div>
+
+  <div
+    class="cart-drawer__footer"
+    id="cart-footer"
+  >
+
+    <div class="cart-drawer__subtotal">
+      <span>Subtotal</span>
+
+      <strong id="cart-subtotal">
+        $0.00
+      </strong>
+    </div>
+
+    <button
+      class="button cart-drawer__checkout"
+      type="button"
+      id="checkout-button"
+    >
+      Checkout
+    </button>
+
+    <p class="cart-drawer__note">
+      Taxes and shipping calculated at checkout.
+    </p>
+
+  </div>
+</aside>
