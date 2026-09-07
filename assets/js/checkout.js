@@ -36,9 +36,20 @@ endpoint:
             "Content-Type": "application/json"
           },
 
-          body: JSON.stringify({
-            items: cart
-          })
+		body: JSON.stringify({
+		  items: cart.map(function (item) {
+			return {
+			  productId:
+				item.productId,
+
+			  sku:
+				item.sku,
+
+			  quantity:
+				item.quantity
+			};
+		  })
+		})
         }
       );
 
