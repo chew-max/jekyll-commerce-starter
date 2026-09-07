@@ -3,14 +3,34 @@ layout: default
 title: Shop
 ---
 
-<section class="page-content">
+<section class="shop-page">
+
   <div class="page-width">
 
-    <h1>Shop</h1>
+    <header class="shop-page__header">
 
-    <p>
-      Products are coming in Phase 2.
-    </p>
+      <p class="shop-page__eyebrow">
+        Shop
+      </p>
+
+      <h1>All Products</h1>
+
+      <p>
+        Browse the complete collection.
+      </p>
+
+    </header>
+
+    <div class="product-grid">
+
+      {% for product in site.products %}
+
+        {% include product-card.html product=product %}
+
+      {% endfor %}
+
+    </div>
 
   </div>
+
 </section>

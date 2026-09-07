@@ -1,7 +1,7 @@
 title: Jekyll Commerce Starter
 description: Reusable Jekyll ecommerce storefront
-url: ""
-baseurl: ""
+url: "https://chew-max.github.io"
+baseurl: "/jekyll-commerce-starter"
 
 markdown: kramdown
 permalink: pretty

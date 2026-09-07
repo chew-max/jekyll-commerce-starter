@@ -600,3 +600,177 @@ p {
   }
 
 }
+
+/* ---------------------------------------------------------
+   Shop
+   --------------------------------------------------------- */
+
+.shop-page {
+  padding: 90px 0;
+}
+
+.shop-page__header {
+  margin-bottom: 50px;
+}
+
+.shop-page__eyebrow {
+  margin-bottom: 12px;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.shop-page__header h1 {
+  margin-bottom: 15px;
+}
+
+.shop-page__header p {
+  color: #666666;
+}
+
+
+/* ---------------------------------------------------------
+   Product Grid
+   --------------------------------------------------------- */
+
+.product-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 45px 24px;
+}
+
+
+/* ---------------------------------------------------------
+   Product Card
+   --------------------------------------------------------- */
+
+.product-card {
+  min-width: 0;
+}
+
+.product-card__image-wrap {
+  position: relative;
+
+  aspect-ratio: 4 / 5;
+
+  overflow: hidden;
+
+  background: #f4f4f4;
+}
+
+.product-card__image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 0.35s ease;
+}
+
+.product-card:hover .product-card__image {
+  transform: scale(1.025);
+}
+
+.product-card__badge {
+  position: absolute;
+
+  top: 14px;
+  left: 14px;
+
+  z-index: 2;
+
+  padding: 6px 10px;
+
+  background: #111111;
+  color: #ffffff;
+
+  font-size: 0.68rem;
+  font-weight: 600;
+
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.product-card__info {
+  padding-top: 16px;
+}
+
+.product-card__title {
+  margin-bottom: 7px;
+
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.product-card__price {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 0.92rem;
+}
+
+.product-card__price-current {
+  font-weight: 600;
+}
+
+.product-card__price-compare {
+  color: #8b8b8b;
+
+  text-decoration: line-through;
+}
+
+
+/* ---------------------------------------------------------
+   Product Grid Responsive
+   --------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+
+  .product-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 800px) {
+
+  .product-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 35px 16px;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .shop-page {
+    padding: 60px 0;
+  }
+
+  .product-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 28px 12px;
+  }
+
+  .product-card__title {
+    font-size: 0.92rem;
+  }
+
+  .product-card__price {
+    font-size: 0.84rem;
+  }
+
+}
