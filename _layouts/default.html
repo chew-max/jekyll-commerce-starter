@@ -38,6 +38,24 @@
   </main>
 
   {% include footer.html %}
+  
+<script>
+  window.JekyllCommerceConfig = {
+    checkoutEndpoint:
+      "{{ site.data.store.commerce.checkout_endpoint }}",
+
+    provider:
+      "{{ site.data.store.commerce.provider }}"
+  };
+</script>
+
+<script
+  src="{{ '/assets/js/checkout.js' | relative_url }}"
+></script>
+
+<script
+  src="{{ '/assets/js/store.js' | relative_url }}"
+></script>
 
 <script
   src="{{ '/assets/js/checkout.js' | relative_url }}"

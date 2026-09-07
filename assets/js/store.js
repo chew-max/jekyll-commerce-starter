@@ -37,13 +37,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  function getCartItemKey(product) {
-    return [
-      product.url,
-      product.color || "",
-      product.size || ""
-    ].join("|");
-  }
+	function getCartItemKey(product) {
+	  return product.sku || [
+		product.productId || product.url,
+		product.color || "",
+		product.size || ""
+	  ].join("|");
+	}
 
 
   function formatMoney(value) {
@@ -278,7 +278,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   });
+	let variantSkus = {};
 
+	const skuData =
+	  document.querySelector("#product-variant-skus");
+
+	if (skuData) {
+	  try {
+		variantSkus =
+		  JSON.parse(skuData.textContent);
+	  } catch (error) {
+		console.error(
+		  "Unable to parse variant SKUs:",
+		  error
+		);
+	  }
+	}
 
   /* =======================================================
      Product Quantity
@@ -371,8 +386,17 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
 
-
+		const selectedSku =
+		variantSkus?.[selectedColor]?.[selectedSize] || null;
+  
 		const product = {
+
+		  productId:
+			addToCartButton.dataset.productId,
+
+		  sku:
+			selectedSku,
+
 		  title:
 			addToCartButton.dataset.productTitle,
 
@@ -398,6 +422,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			  quantityInput?.value || "1",
 			  10
 			)
+
 		};
 
 

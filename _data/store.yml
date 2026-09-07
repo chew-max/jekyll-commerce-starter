@@ -24,3 +24,7 @@ social:
   instagram: ""
   facebook: ""
   tiktok: ""
+  
+commerce:
+  checkout_endpoint: ""
+  provider: ""
