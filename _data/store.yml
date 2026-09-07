@@ -1,0 +1,26 @@
+brand:
+  name: "Jekyll Commerce"
+  tagline: "A modern storefront built with Jekyll"
+  logo: "/assets/images/logo.svg"
+
+theme:
+  primary: "#111111"
+  secondary: "#666666"
+  accent: "#111111"
+  background: "#ffffff"
+
+store:
+  currency: "USD"
+  currency_symbol: "$"
+
+announcement:
+  enabled: true
+  text: "Free shipping on orders over $50"
+
+contact:
+  email: "support@example.com"
+
+social:
+  instagram: ""
+  facebook: ""
+  tiktok: ""
