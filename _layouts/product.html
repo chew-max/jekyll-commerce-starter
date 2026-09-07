@@ -1,0 +1,232 @@
+---
+layout: default
+---
+
+<section class="product-page">
+  <div class="page-width">
+
+    <div class="product-page__grid">
+
+      <div class="product-gallery">
+
+        {% if page.images and page.images.size > 0 %}
+
+          <div class="product-gallery__main">
+            <img
+              id="product-main-image"
+              src="{{ page.images[0] | relative_url }}"
+              alt="{{ page.title }}"
+            >
+          </div>
+
+          {% if page.images.size > 1 %}
+            <div class="product-gallery__thumbs">
+
+              {% for image in page.images %}
+
+                <button
+                  class="product-gallery__thumb {% if forloop.first %}is-active{% endif %}"
+                  type="button"
+                  data-image="{{ image | relative_url }}"
+                >
+
+                  <img
+                    src="{{ image | relative_url }}"
+                    alt="{{ page.title }} image {{ forloop.index }}"
+                  >
+
+                </button>
+
+              {% endfor %}
+
+            </div>
+          {% endif %}
+
+        {% endif %}
+
+      </div>
+
+
+      <div class="product-info">
+
+        {% if page.badge %}
+          <p class="product-info__badge">
+            {{ page.badge }}
+          </p>
+        {% endif %}
+
+        <h1>{{ page.title }}</h1>
+
+        <div class="product-info__price">
+
+          <span class="product-info__price-current">
+            {{ site.data.store.store.currency_symbol }}
+            {{ page.price }}
+          </span>
+
+          {% if page.compare_at_price %}
+            <span class="product-info__price-compare">
+              {{ site.data.store.store.currency_symbol }}
+              {{ page.compare_at_price }}
+            </span>
+          {% endif %}
+
+        </div>
+
+        {% if page.short_description %}
+          <div class="product-info__short-description">
+            {{ page.short_description }}
+          </div>
+        {% endif %}
+
+
+        {% if page.variants.colors %}
+
+          <div class="product-option">
+
+            <div class="product-option__header">
+              <span>Color</span>
+
+              <span
+                id="selected-color"
+                class="product-option__selected"
+              >
+                {{ page.variants.colors[0] }}
+              </span>
+            </div>
+
+            <div class="product-option__values">
+
+              {% for color in page.variants.colors %}
+
+                <button
+                  type="button"
+                  class="variant-button color-option {% if forloop.first %}is-selected{% endif %}"
+                  data-option="color"
+                  data-value="{{ color }}"
+                >
+                  {{ color }}
+                </button>
+
+              {% endfor %}
+
+            </div>
+
+          </div>
+
+        {% endif %}
+
+
+        {% if page.variants.sizes %}
+
+          <div class="product-option">
+
+            <div class="product-option__header">
+
+              <span>Size</span>
+
+              <span
+                id="selected-size"
+                class="product-option__selected"
+              >
+                Select a size
+              </span>
+
+            </div>
+
+            <div class="product-option__values product-option__sizes">
+
+              {% for size in page.variants.sizes %}
+
+                <button
+                  type="button"
+                  class="variant-button size-option"
+                  data-option="size"
+                  data-value="{{ size }}"
+                >
+                  {{ size }}
+                </button>
+
+              {% endfor %}
+
+            </div>
+
+          </div>
+
+        {% endif %}
+
+
+        <div class="quantity-selector">
+
+          <label for="product-quantity">
+            Quantity
+          </label>
+
+          <div class="quantity-selector__controls">
+
+            <button
+              type="button"
+              id="quantity-minus"
+              aria-label="Decrease quantity"
+            >
+              −
+            </button>
+
+            <input
+              id="product-quantity"
+              type="number"
+              value="1"
+              min="1"
+              max="10"
+            >
+
+            <button
+              type="button"
+              id="quantity-plus"
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <button
+          id="add-to-cart"
+          class="button product-info__add"
+          type="button"
+          data-product-title="{{ page.title }}"
+          data-product-price="{{ page.price }}"
+          data-product-url="{{ page.url | relative_url }}"
+        >
+          Add to Cart
+        </button>
+
+
+        <p
+          id="product-message"
+          class="product-message"
+          aria-live="polite"
+        ></p>
+
+
+        {% if page.description %}
+          <div class="product-info__description">
+
+            <h2>Details</h2>
+
+            <p>
+              {{ page.description }}
+            </p>
+
+          </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
