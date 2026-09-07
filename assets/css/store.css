@@ -971,7 +971,24 @@ body.cart-open {
   object-fit: cover;
 }
 
+.cart-drawer__customer {
+  margin-bottom: 16px;
+}
 
+.cart-drawer__customer label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.cart-drawer__email {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font: inherit;
+}
 
 /* ---------------------------------------------------------
    Product Grid Responsive

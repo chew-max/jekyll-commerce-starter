@@ -1,0 +1,27 @@
+---
+layout: default
+title: Order Confirmed
+---
+
+<section class="checkout-result">
+  <div class="container">
+    <h1>Thank you!</h1>
+
+    <p>
+      Your payment was completed successfully.
+    </p>
+
+    <a
+      class="button"
+      href="{{ '/' | relative_url }}"
+    >
+      Continue Shopping
+    </a>
+  </div>
+</section>
+
+<script>
+  localStorage.removeItem(
+    "jekyllCommerceCart"
+  );
+</script>

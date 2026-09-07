@@ -4,7 +4,7 @@ endpoint:
   window.JekyllCommerceConfig
     ?.checkoutEndpoint || "",
 
-  start: async function (cart) {
+  start: async function (cart, email) {
 
     if (!Array.isArray(cart) || cart.length === 0) {
       alert("Your cart is empty.");
@@ -37,16 +37,13 @@ endpoint:
           },
 
 		body: JSON.stringify({
+		  email: email,
+
 		  items: cart.map(function (item) {
 			return {
-			  productId:
-				item.productId,
-
-			  sku:
-				item.sku,
-
-			  quantity:
-				item.quantity
+			  productId: item.productId,
+			  sku: item.sku,
+			  quantity: item.quantity
 			};
 		  })
 		})

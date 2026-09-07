@@ -793,7 +793,28 @@ document.addEventListener("DOMContentLoaded", function () {
 		  window.JekyllCommerceCheckout &&
 		  typeof window.JekyllCommerceCheckout.start === "function"
 		) {
-		  window.JekyllCommerceCheckout.start(cart);
+		  const checkoutEmail =
+		document.querySelector("#checkout-email");
+
+		const email =
+		  checkoutEmail?.value.trim() || "";
+
+		if (!email) {
+		  alert("Please enter your email.");
+		  checkoutEmail?.focus();
+		  return;
+		}
+
+		if (!checkoutEmail.checkValidity()) {
+		  alert("Please enter a valid email address.");
+		  checkoutEmail.focus();
+		  return;
+		}
+
+		window.JekyllCommerceCheckout.start(
+		  cart,
+		  email
+		);
 		}
 
 	  }
