@@ -193,16 +193,17 @@ layout: default
         </div>
 
 
-        <button
-          id="add-to-cart"
-          class="button product-info__add"
-          type="button"
-          data-product-title="{{ page.title }}"
-          data-product-price="{{ page.price }}"
-          data-product-url="{{ page.url | relative_url }}"
-        >
-          Add to Cart
-        </button>
+		<button
+		  id="add-to-cart"
+		  class="button product-info__add"
+		  type="button"
+		  data-product-title="{{ page.title }}"
+		  data-product-price="{{ page.price }}"
+		  data-product-url="{{ page.url | relative_url }}"
+		  data-product-image="{{ page.images[0] | relative_url }}"
+		>
+		  Add to Cart
+		</button>
 
 
         <p

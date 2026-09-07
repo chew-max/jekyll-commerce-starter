@@ -372,30 +372,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        const product = {
-          title:
-            addToCartButton.dataset.productTitle,
+		const product = {
+		  title:
+			addToCartButton.dataset.productTitle,
 
-          price:
-            parseFloat(
-              addToCartButton.dataset.productPrice
-            ),
+		  price:
+			parseFloat(
+			  addToCartButton.dataset.productPrice
+			),
 
-          url:
-            addToCartButton.dataset.productUrl,
+		  url:
+			addToCartButton.dataset.productUrl,
 
-          color:
-            selectedColor,
+		  image:
+			addToCartButton.dataset.productImage,
 
-          size:
-            selectedSize,
+		  color:
+			selectedColor,
 
-          quantity:
-            parseInt(
-              quantityInput?.value || "1",
-              10
-            )
-        };
+		  size:
+			selectedSize,
+
+		  quantity:
+			parseInt(
+			  quantityInput?.value || "1",
+			  10
+			)
+		};
 
 
         const cart = getCart();
@@ -705,9 +708,30 @@ document.addEventListener("DOMContentLoaded", function () {
         price,
         controls
       );
+		const imageWrap =
+		  document.createElement("a");
 
+		imageWrap.className =
+		  "cart-item__image";
 
-      itemElement.append(details);
+		imageWrap.href =
+		  item.url;
+
+		const image =
+		  document.createElement("img");
+
+		image.src =
+		  item.image || "";
+
+		image.alt =
+		  item.title;
+
+		imageWrap.append(image);
+
+		itemElement.append(
+		  imageWrap,
+		  details
+		);
 
       cartItems.append(itemElement);
 
@@ -729,24 +753,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const checkoutButton =
     document.querySelector("#checkout-button");
 
+	checkoutButton?.addEventListener(
+	  "click",
+	  function () {
 
-  checkoutButton?.addEventListener(
-    "click",
-    function () {
+		const cart = getCart();
 
-      const cart = getCart();
+		if (
+		  window.JekyllCommerceCheckout &&
+		  typeof window.JekyllCommerceCheckout.start === "function"
+		) {
+		  window.JekyllCommerceCheckout.start(cart);
+		}
 
-      console.log(
-        "Checkout cart:",
-        cart
-      );
-
-      alert(
-        "Checkout integration comes next."
-      );
-
-    }
-  );
+	  }
+	);
 
 
   /* =======================================================
