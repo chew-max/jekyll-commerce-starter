@@ -812,8 +812,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 
 		window.JekyllCommerceCheckout.start(
-		  cart,
-		  email
+		  cart
 		);
 		}
 
