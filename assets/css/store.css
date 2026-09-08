@@ -859,7 +859,19 @@ p {
   text-align: center;
 }
 
-
+.cart-drawer__panel {
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.cart-drawer__header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+}
 /* ---------------------------------------------------------
    Cart Items
    --------------------------------------------------------- */
