@@ -4,43 +4,187 @@
     "name": "Weekend Warrior Tee",
     "price": 24.99,
     "price_cents": 2499,
-    "colors": [
-      "Black",
-      "Navy",
-      "Heather Gray"
+    "option_names": [
+      "color",
+      "size"
     ],
-    "sizes": [
-      "S",
-      "M",
-      "L",
-      "XL",
-      "2XL",
-      "3XL"
-    ],
-    "variant_skus": {
-      "Black": {
-        "S": "WWT-BLK-S",
-        "M": "WWT-BLK-M",
-        "L": "WWT-BLK-L",
-        "XL": "WWT-BLK-XL",
-        "2XL": "WWT-BLK-2XL",
-        "3XL": "WWT-BLK-3XL"
+    "option_values": {
+      "color": [
+        "Black",
+        "Navy",
+        "Heather Gray"
+      ],
+      "size": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL",
+        "3XL"
+      ]
+    },
+    "variant_index": {
+      "Black||S": {
+        "sku": "WWT-BLK-S",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Black",
+          "size": "S"
+        }
       },
-      "Navy": {
-        "S": "WWT-NVY-S",
-        "M": "WWT-NVY-M",
-        "L": "WWT-NVY-L",
-        "XL": "WWT-NVY-XL",
-        "2XL": "WWT-NVY-2XL",
-        "3XL": "WWT-NVY-3XL"
+      "Black||M": {
+        "sku": "WWT-BLK-M",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Black",
+          "size": "M"
+        }
       },
-      "Heather Gray": {
-        "S": "WWT-HGR-S",
-        "M": "WWT-HGR-M",
-        "L": "WWT-HGR-L",
-        "XL": "WWT-HGR-XL",
-        "2XL": "WWT-HGR-2XL",
-        "3XL": "WWT-HGR-3XL"
+      "Black||L": {
+        "sku": "WWT-BLK-L",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Black",
+          "size": "L"
+        }
+      },
+      "Black||XL": {
+        "sku": "WWT-BLK-XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Black",
+          "size": "XL"
+        }
+      },
+      "Black||2XL": {
+        "sku": "WWT-BLK-2XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Black",
+          "size": "2XL"
+        }
+      },
+      "Black||3XL": {
+        "sku": "WWT-BLK-3XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Black",
+          "size": "3XL"
+        }
+      },
+      "Navy||S": {
+        "sku": "WWT-NVY-S",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Navy",
+          "size": "S"
+        }
+      },
+      "Navy||M": {
+        "sku": "WWT-NVY-M",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Navy",
+          "size": "M"
+        }
+      },
+      "Navy||L": {
+        "sku": "WWT-NVY-L",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Navy",
+          "size": "L"
+        }
+      },
+      "Navy||XL": {
+        "sku": "WWT-NVY-XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Navy",
+          "size": "XL"
+        }
+      },
+      "Navy||2XL": {
+        "sku": "WWT-NVY-2XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Navy",
+          "size": "2XL"
+        }
+      },
+      "Navy||3XL": {
+        "sku": "WWT-NVY-3XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Navy",
+          "size": "3XL"
+        }
+      },
+      "Heather Gray||S": {
+        "sku": "WWT-HGR-S",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Heather Gray",
+          "size": "S"
+        }
+      },
+      "Heather Gray||M": {
+        "sku": "WWT-HGR-M",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Heather Gray",
+          "size": "M"
+        }
+      },
+      "Heather Gray||L": {
+        "sku": "WWT-HGR-L",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Heather Gray",
+          "size": "L"
+        }
+      },
+      "Heather Gray||XL": {
+        "sku": "WWT-HGR-XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Heather Gray",
+          "size": "XL"
+        }
+      },
+      "Heather Gray||2XL": {
+        "sku": "WWT-HGR-2XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Heather Gray",
+          "size": "2XL"
+        }
+      },
+      "Heather Gray||3XL": {
+        "sku": "WWT-HGR-3XL",
+        "price": 24.99,
+        "price_cents": 2499,
+        "options": {
+          "color": "Heather Gray",
+          "size": "3XL"
+        }
       }
     },
     "variants": [

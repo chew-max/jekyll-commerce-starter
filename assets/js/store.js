@@ -210,91 +210,209 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
-  /* =======================================================
+   /* =======================================================
      Product Variants
      ======================================================= */
 
-  let selectedColor = null;
-  let selectedSize = null;
+  let commerceProduct = null;
 
-  const colorButtons =
-    document.querySelectorAll(".color-option");
+  const selectedOptions = {};
 
-  const sizeButtons =
-    document.querySelectorAll(".size-option");
+  const optionButtons =
+    document.querySelectorAll(
+      ".product-option-value"
+    );
+
+  const commerceData =
+    document.querySelector(
+      "#product-commerce-data"
+    );
+
+  const currentPrice =
+    document.querySelector(
+      "#product-current-price"
+    );
 
 
-  if (colorButtons.length > 0) {
-    selectedColor =
-      colorButtons[0].getAttribute("data-value");
+  if (commerceData) {
+    try {
+      commerceProduct =
+        JSON.parse(
+          commerceData.textContent
+        );
+    } catch (error) {
+      console.error(
+        "Unable to parse product commerce data:",
+        error
+      );
+    }
   }
 
 
-  colorButtons.forEach(function (button) {
+  function getVariantKey() {
+    if (
+      !commerceProduct ||
+      !Array.isArray(
+        commerceProduct.option_names
+      )
+    ) {
+      return "";
+    }
 
-    button.addEventListener("click", function () {
+    return commerceProduct.option_names
+      .map(function (optionName) {
+        return (
+          selectedOptions[
+            optionName
+          ] || ""
+        );
+      })
+      .join("||");
+  }
 
-      colorButtons.forEach(function (item) {
-        item.classList.remove("is-selected");
+
+  function allOptionsSelected() {
+    if (
+      !commerceProduct ||
+      !Array.isArray(
+        commerceProduct.option_names
+      )
+    ) {
+      return false;
+    }
+
+    return commerceProduct.option_names
+      .every(function (optionName) {
+        return Boolean(
+          selectedOptions[
+            optionName
+          ]
+        );
       });
-
-      button.classList.add("is-selected");
-
-      selectedColor =
-        button.getAttribute("data-value");
-
-      const label =
-        document.querySelector("#selected-color");
-
-      if (label) {
-        label.textContent = selectedColor;
-      }
-
-    });
-
-  });
+  }
 
 
-  sizeButtons.forEach(function (button) {
+  function getSelectedVariant() {
+    if (
+      !commerceProduct ||
+      !commerceProduct.variant_index
+    ) {
+      return null;
+    }
 
-    button.addEventListener("click", function () {
+    if (
+      commerceProduct.option_names
+        ?.length > 0 &&
+      !allOptionsSelected()
+    ) {
+      return null;
+    }
 
-      sizeButtons.forEach(function (item) {
-        item.classList.remove("is-selected");
-      });
+    const key =
+      getVariantKey();
 
-      button.classList.add("is-selected");
+    return (
+      commerceProduct.variant_index[
+        key
+      ] ||
+      null
+    );
+  }
 
-      selectedSize =
-        button.getAttribute("data-value");
 
-      const label =
-        document.querySelector("#selected-size");
+  function updateVariantPrice() {
+    if (!currentPrice) {
+      return;
+    }
 
-      if (label) {
-        label.textContent = selectedSize;
-      }
+    const variant =
+      getSelectedVariant();
 
-    });
+    const price =
+      variant?.price ??
+      commerceProduct?.price;
 
-  });
-	let variantSkus = {};
+    if (
+      price === undefined ||
+      price === null
+    ) {
+      return;
+    }
 
-	const skuData =
-	  document.querySelector("#product-variant-skus");
+    currentPrice.textContent =
+      formatMoney(price);
+  }
 
-	if (skuData) {
-	  try {
-		variantSkus =
-		  JSON.parse(skuData.textContent);
-	  } catch (error) {
-		console.error(
-		  "Unable to parse variant SKUs:",
-		  error
-		);
-	  }
-	}
 
+  optionButtons.forEach(
+    function (button) {
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          const optionName =
+            button.getAttribute(
+              "data-option"
+            );
+
+          const optionValue =
+            button.getAttribute(
+              "data-value"
+            );
+
+          if (
+            !optionName ||
+            !optionValue
+          ) {
+            return;
+          }
+
+
+          selectedOptions[
+            optionName
+          ] = optionValue;
+
+
+          document
+            .querySelectorAll(
+              `.product-option-value[data-option="${optionName}"]`
+            )
+            .forEach(
+              function (item) {
+                item.classList.remove(
+                  "is-selected"
+                );
+              }
+            );
+
+
+          button.classList.add(
+            "is-selected"
+          );
+
+
+          const label =
+            document.querySelector(
+              `[data-selected-option="${optionName}"]`
+            );
+
+          if (label) {
+            label.textContent =
+              optionValue;
+          }
+
+
+          updateVariantPrice();
+
+        }
+      );
+
+    }
+  );
+
+
+  updateVariantPrice();
   /* =======================================================
      Product Quantity
      ======================================================= */
@@ -353,15 +471,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  /* =======================================================
+   /* =======================================================
      Add To Cart
      ======================================================= */
 
   const addToCartButton =
-    document.querySelector("#add-to-cart");
+    document.querySelector(
+      "#add-to-cart"
+    );
 
   const productMessage =
-    document.querySelector("#product-message");
+    document.querySelector(
+      "#product-message"
+    );
 
 
   if (addToCartButton) {
@@ -371,13 +493,26 @@ document.addEventListener("DOMContentLoaded", function () {
       function () {
 
         if (
-          sizeButtons.length > 0 &&
-          !selectedSize
+          commerceProduct?.option_names
+            ?.length > 0 &&
+          !allOptionsSelected()
         ) {
 
+          const missingOption =
+            commerceProduct.option_names
+              .find(
+                function (optionName) {
+                  return !selectedOptions[
+                    optionName
+                  ];
+                }
+              );
+
+
           if (productMessage) {
+
             productMessage.textContent =
-              "Please select a size.";
+              `Please select ${missingOption}.`;
 
             productMessage.className =
               "product-message is-error";
@@ -386,81 +521,140 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
 
-		const selectedSku =
-		variantSkus?.[selectedColor]?.[selectedSize] || null;
-  
-		const product = {
 
-		  productId:
-			addToCartButton.dataset.productId,
-
-		  sku:
-			selectedSku,
-
-		  title:
-			addToCartButton.dataset.productTitle,
-
-		  price:
-			parseFloat(
-			  addToCartButton.dataset.productPrice
-			),
-
-		  url:
-			addToCartButton.dataset.productUrl,
-
-		  image:
-			addToCartButton.dataset.productImage,
-
-		  color:
-			selectedColor,
-
-		  size:
-			selectedSize,
-
-		  quantity:
-			parseInt(
-			  quantityInput?.value || "1",
-			  10
-			)
-
-		};
+        const selectedVariant =
+          getSelectedVariant();
 
 
-        const cart = getCart();
+        if (!selectedVariant) {
+
+          if (productMessage) {
+
+            productMessage.textContent =
+              "This product combination is unavailable.";
+
+            productMessage.className =
+              "product-message is-error";
+          }
+
+          return;
+        }
+
+
+        const product = {
+
+          productId:
+            addToCartButton.dataset
+              .productId,
+
+          sku:
+            selectedVariant.sku,
+
+          title:
+            addToCartButton.dataset
+              .productTitle,
+
+          price:
+            Number(
+              selectedVariant.price
+            ),
+
+          url:
+            addToCartButton.dataset
+              .productUrl,
+
+          image:
+            addToCartButton.dataset
+              .productImage,
+
+          options:
+            {
+              ...selectedOptions
+            },
+
+          color:
+            selectedOptions.color ||
+            null,
+
+          size:
+            selectedOptions.size ||
+            null,
+
+          quantity:
+            parseInt(
+              quantityInput?.value ||
+              "1",
+              10
+            )
+
+        };
+
+
+        const cart =
+          getCart();
 
         const productKey =
-          getCartItemKey(product);
+          getCartItemKey(
+            product
+          );
 
         const existingItem =
-          cart.find(function (item) {
-            return (
-              getCartItemKey(item) ===
-              productKey
-            );
-          });
+          cart.find(
+            function (item) {
+
+              return (
+                getCartItemKey(
+                  item
+                ) ===
+                productKey
+              );
+
+            }
+          );
 
 
-		if (existingItem) {
+        if (existingItem) {
 
-		  existingItem.quantity += product.quantity;
+          existingItem.quantity +=
+            product.quantity;
 
-		  // Keep existing cart data synced with current product data
-		  existingItem.title = product.title;
-		  existingItem.price = product.price;
-		  existingItem.image = product.image;
-		  existingItem.url = product.url;
+          existingItem.title =
+            product.title;
 
-		} else {
+          existingItem.price =
+            product.price;
 
-		  cart.push(product);
+          existingItem.image =
+            product.image;
 
-}
+          existingItem.url =
+            product.url;
+
+          existingItem.options =
+            product.options;
+
+          existingItem.color =
+            product.color;
+
+          existingItem.size =
+            product.size;
+
+        } else {
+
+          cart.push(
+            product
+          );
+
+        }
 
 
-        saveCart(cart);
+        saveCart(
+          cart
+        );
 
 
         if (productMessage) {
+
           productMessage.textContent =
             "Added to cart.";
 
@@ -475,7 +669,6 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
   }
-
 
   /* =======================================================
      Cart Rendering
@@ -580,11 +773,19 @@ document.addEventListener("DOMContentLoaded", function () {
       meta.className =
         "cart-item__meta";
 
+      const optionValues =
+        item.options
+          ? Object.values(
+              item.options
+            )
+          : [
+              item.color,
+              item.size
+            ];
+
+
       meta.textContent =
-        [
-          item.color,
-          item.size
-        ]
+        optionValues
           .filter(Boolean)
           .join(" / ");
 
