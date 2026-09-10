@@ -326,13 +326,12 @@ window.JekyllCommerceCheckout = {
           await response.json();
 
 
-        if (!response.ok) {
-          throw new Error(
-            data.error ||
-            "Checkout request failed."
-          );
-        }
-
+		if (!response.ok) {
+		  throw new Error(
+			data.message ||
+			"Checkout could not be created."
+		  );
+		}
 
         if (
           data.checkoutUrl
