@@ -351,5 +351,101 @@
         }
       }
     ]
+  },
+  "TMB-001": {
+    "product_id": "TMB-001",
+    "name": "Test Tumbler",
+    "price": 29.99,
+    "price_cents": 2999,
+    "option_names": [
+      "color",
+      "capacity"
+    ],
+    "option_values": {
+      "color": [
+        "Black",
+        "White"
+      ],
+      "capacity": [
+        "20 oz",
+        "30 oz"
+      ]
+    },
+    "variant_index": {
+      "Black||20 oz": {
+        "sku": "TMB-BLK-20OZ",
+        "price": 29.99,
+        "price_cents": 2999,
+        "options": {
+          "color": "Black",
+          "capacity": "20 oz"
+        }
+      },
+      "Black||30 oz": {
+        "sku": "TMB-BLK-30OZ",
+        "price": 34.99,
+        "price_cents": 3499,
+        "options": {
+          "color": "Black",
+          "capacity": "30 oz"
+        }
+      },
+      "White||20 oz": {
+        "sku": "TMB-WHT-20OZ",
+        "price": 29.99,
+        "price_cents": 2999,
+        "options": {
+          "color": "White",
+          "capacity": "20 oz"
+        }
+      },
+      "White||30 oz": {
+        "sku": "TMB-WHT-30OZ",
+        "price": 34.99,
+        "price_cents": 3499,
+        "options": {
+          "color": "White",
+          "capacity": "30 oz"
+        }
+      }
+    },
+    "variants": [
+      {
+        "sku": "TMB-BLK-20OZ",
+        "price": 29.99,
+        "price_cents": 2999,
+        "options": {
+          "color": "Black",
+          "capacity": "20 oz"
+        }
+      },
+      {
+        "sku": "TMB-BLK-30OZ",
+        "price": 34.99,
+        "price_cents": 3499,
+        "options": {
+          "color": "Black",
+          "capacity": "30 oz"
+        }
+      },
+      {
+        "sku": "TMB-WHT-20OZ",
+        "price": 29.99,
+        "price_cents": 2999,
+        "options": {
+          "color": "White",
+          "capacity": "20 oz"
+        }
+      },
+      {
+        "sku": "TMB-WHT-30OZ",
+        "price": 34.99,
+        "price_cents": 3499,
+        "options": {
+          "color": "White",
+          "capacity": "30 oz"
+        }
+      }
+    ]
   }
 }
