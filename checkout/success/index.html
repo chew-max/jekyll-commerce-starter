@@ -142,6 +142,29 @@ title: Order Confirmed
     <h1 class="checkout-success__title">
       Thank you for your order!
     </h1>
+	<div
+	  id="order-reference"
+	  style="
+		display:none;
+		margin-top:24px;
+		padding:16px;
+		background:#f9fafb;
+		border-radius:8px;
+	  "
+	>
+	  <strong>
+		Order reference
+	  </strong>
+
+	  <div
+		id="order-reference-value"
+		style="
+		  margin-top:6px;
+		  font-family:monospace;
+		  word-break:break-word;
+		"
+	  ></div>
+	</div>
 
     <p class="checkout-success__lead">
       Your payment was completed successfully
@@ -236,4 +259,30 @@ title: Order Confirmed
   localStorage.removeItem(
     "jekyllCommerceCart"
   );
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const orderReference =
+    params.get("order");
+
+  if (orderReference) {
+    const wrapper =
+      document.getElementById(
+        "order-reference"
+      );
+
+    const value =
+      document.getElementById(
+        "order-reference-value"
+      );
+
+    value.textContent =
+      orderReference;
+
+    wrapper.style.display =
+      "block";
+  }
 </script>
