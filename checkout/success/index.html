@@ -46,6 +46,20 @@ title: Order Confirmed
     line-height: 1.6;
   }
 
+  .checkout-success__reference {
+    display: none;
+    margin-top: 24px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+  }
+
+  .checkout-success__reference-value {
+    margin-top: 6px;
+    font-family: monospace;
+    word-break: break-word;
+  }
+
   .checkout-success__next {
     margin-top: 36px;
     padding: 28px;
@@ -107,7 +121,36 @@ title: Order Confirmed
   .checkout-success__actions {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
     margin-top: 32px;
+  }
+
+  .checkout-success__button {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .checkout-success__button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  .checkout-success__button--primary {
+    background: #111827;
+    color: #ffffff !important;
+  }
+
+  .checkout-success__button--secondary {
+    background: #f3f4f6;
+    color: #111827 !important;
   }
 
   @media (max-width: 600px) {
@@ -126,6 +169,15 @@ title: Order Confirmed
     .checkout-success__next {
       padding: 22px;
     }
+
+    .checkout-success__actions {
+      flex-direction: column;
+    }
+
+    .checkout-success__button {
+      width: 100%;
+      box-sizing: border-box;
+    }
   }
 </style>
 
@@ -142,29 +194,20 @@ title: Order Confirmed
     <h1 class="checkout-success__title">
       Thank you for your order!
     </h1>
-	<div
-	  id="order-reference"
-	  style="
-		display:none;
-		margin-top:24px;
-		padding:16px;
-		background:#f9fafb;
-		border-radius:8px;
-	  "
-	>
-	  <strong>
-		Order reference
-	  </strong>
 
-	  <div
-		id="order-reference-value"
-		style="
-		  margin-top:6px;
-		  font-family:monospace;
-		  word-break:break-word;
-		"
-	  ></div>
-	</div>
+    <div
+      id="order-reference"
+      class="checkout-success__reference"
+    >
+      <strong>
+        Order reference
+      </strong>
+
+      <div
+        id="order-reference-value"
+        class="checkout-success__reference-value"
+      ></div>
+    </div>
 
     <p class="checkout-success__lead">
       Your payment was completed successfully
@@ -244,18 +287,38 @@ title: Order Confirmed
     </p>
 
     <div class="checkout-success__actions">
+
       <a
-        class="button"
+        id="view-order-status"
+        class="
+          checkout-success__button
+          checkout-success__button--primary
+        "
+        href="#"
+        hidden
+      >
+        View Order Status
+      </a>
+
+      <a
+        class="
+          checkout-success__button
+          checkout-success__button--secondary
+        "
         href="{{ '/shop/' | relative_url }}"
       >
         Continue Shopping
       </a>
+
     </div>
 
   </div>
 </section>
 
 <script>
+(function () {
+  "use strict";
+
   localStorage.removeItem(
     "jekyllCommerceCart"
   );
@@ -267,6 +330,9 @@ title: Order Confirmed
 
   const orderReference =
     params.get("order");
+
+  const token =
+    params.get("token");
 
   if (orderReference) {
     const wrapper =
@@ -285,4 +351,29 @@ title: Order Confirmed
     wrapper.style.display =
       "block";
   }
+
+  if (token) {
+    const statusButton =
+      document.getElementById(
+        "view-order-status"
+      );
+
+    const statusUrl =
+      new URL(
+        "{{ '/order-status/' | relative_url }}",
+        window.location.origin
+      );
+
+    statusUrl.searchParams.set(
+      "token",
+      token
+    );
+
+    statusButton.href =
+      statusUrl.toString();
+
+    statusButton.hidden =
+      false;
+  }
+})();
 </script>
