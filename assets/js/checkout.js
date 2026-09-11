@@ -241,209 +241,160 @@ window.JekyllCommerceCheckout = {
     },
 
 
-  getCheckoutErrorMessage:
-    function (
-      response,
-      data
-    ) {
-      const status =
-        Number(
-          response?.status || 0
-        );
+function getCheckoutErrorMessage(response, data) {
+  const status =
+    Number(response?.status) || 0;
 
-      const code =
-        String(
-          data?.code ||
-          data?.errorCode ||
-          data?.error ||
-          ""
-        )
-          .trim()
-          .toLowerCase();
+  const errorCode =
+    String(data?.error || "")
+      .trim()
+      .toUpperCase();
 
-      const rawMessage =
-        String(
-          data?.message || ""
-        )
-          .trim();
-
-      const combined =
-        (
-          code +
-          " " +
-          rawMessage
-        )
-          .toLowerCase();
+  const serverMessage =
+    String(data?.message || "")
+      .trim();
 
 
-      /*
-       * Unavailable product / variant.
-       *
-       * Supports both future structured
-       * error codes and the existing
-       * human-readable backend messages.
-       */
-      if (
-        combined.includes(
-          "unavailable"
-        ) ||
-        combined.includes(
-          "not available"
-        ) ||
-        combined.includes(
-          "unfulfillable"
-        ) ||
-        combined.includes(
-          "not fulfillable"
-        ) ||
-        combined.includes(
-          "variant_not_available"
-        ) ||
-        combined.includes(
-          "product_not_available"
-        ) ||
-        combined.includes(
-          "sku_not_available"
-        )
-      ) {
-        return (
-          "One or more items in your cart are no longer available. " +
-          "Please review your cart, remove or change the unavailable item, and try checkout again."
-        );
-      }
+  /*
+   * -------------------------------------------------------
+   * Temporary checkout / service failures
+   * -------------------------------------------------------
+   *
+   * IMPORTANT:
+   * Handle CHECKOUT_UNAVAILABLE before looking for the
+   * generic word "unavailable".
+   *
+   * Otherwise CHECKOUT_UNAVAILABLE gets incorrectly treated
+   * as VARIANT_UNAVAILABLE.
+   */
+
+  if (
+    errorCode === "CHECKOUT_UNAVAILABLE" ||
+    status >= 500
+  ) {
+    return (
+      "Checkout is temporarily unavailable. " +
+      "Your cart has been preserved. Please try again."
+    );
+  }
 
 
-      /*
-       * Unknown or invalid SKU/product.
-       *
-       * This can happen if the storefront
-       * is stale relative to the backend
-       * catalog.
-       */
-      if (
-        combined.includes(
-          "unknown sku"
-        ) ||
-        combined.includes(
-          "invalid sku"
-        ) ||
-        combined.includes(
-          "sku not found"
-        ) ||
-        combined.includes(
-          "unknown product"
-        ) ||
-        combined.includes(
-          "product not found"
-        )
-      ) {
-        return (
-          "One or more items in your cart could not be verified. " +
-          "Please remove the affected item and add it again from the shop."
-        );
-      }
+  /*
+   * -------------------------------------------------------
+   * Rate limiting
+   * -------------------------------------------------------
+   */
+
+  if (status === 429) {
+    return (
+      "Checkout is temporarily busy. " +
+      "Please wait a moment and try again."
+    );
+  }
 
 
-      /*
-       * Quantity validation.
-       */
-      if (
-        combined.includes(
-          "quantity"
-        ) &&
-        (
-          combined.includes(
-            "maximum"
-          ) ||
-          combined.includes(
-            "max"
-          ) ||
-          combined.includes(
-            "limit"
-          ) ||
-          combined.includes(
-            "invalid"
-          )
-        )
-      ) {
-        return (
-          "One or more cart quantities need to be adjusted before checkout. " +
-          "Please review your cart and try again."
-        );
-      }
+  /*
+   * -------------------------------------------------------
+   * Product / variant availability
+   * -------------------------------------------------------
+   */
+
+  if (
+    errorCode === "VARIANT_UNAVAILABLE" ||
+    errorCode === "PRODUCT_UNAVAILABLE" ||
+    errorCode === "UNFULFILLABLE_VARIANT"
+  ) {
+    return (
+      "One or more items in your cart are no longer available. " +
+      "Please review your cart, remove or change the unavailable " +
+      "item, and try checkout again."
+    );
+  }
 
 
-      /*
-       * Customer-address validation.
-       */
-      if (
-        status === 400 &&
-        (
-          combined.includes(
-            "address"
-          ) ||
-          combined.includes(
-            "postal"
-          ) ||
-          combined.includes(
-            "zip"
-          ) ||
-          combined.includes(
-            "shipping"
-          )
-        )
-      ) {
-        return (
-          "We couldn't verify the shipping information for this order. " +
-          "Please review your address and try again."
-        );
-      }
+  /*
+   * -------------------------------------------------------
+   * Invalid / stale catalog item
+   * -------------------------------------------------------
+   */
+
+  if (
+    errorCode.includes("INVALID_SKU") ||
+    serverMessage
+      .toLowerCase()
+      .includes("invalid sku")
+  ) {
+    return (
+      "One or more items in your cart could not be found. " +
+      "Please review your cart and try again."
+    );
+  }
 
 
-      /*
-       * Rate limiting.
-       */
-      if (status === 429) {
-        return (
-          "Checkout is receiving a lot of requests right now. " +
-          "Please wait a moment and try again."
-        );
-      }
+  /*
+   * -------------------------------------------------------
+   * Quantity validation
+   * -------------------------------------------------------
+   */
+
+  if (
+    errorCode.includes("QUANTITY") ||
+    serverMessage
+      .toLowerCase()
+      .includes("quantity")
+  ) {
+    return (
+      "One or more item quantities could not be accepted. " +
+      "Please review your cart and try again."
+    );
+  }
 
 
-      /*
-       * Server/provider outage.
-       */
-      if (status >= 500) {
-        return (
-          "Checkout is temporarily unavailable. " +
-          "Your cart has been preserved. Please wait a moment and try again."
-        );
-      }
+  /*
+   * -------------------------------------------------------
+   * Customer / shipping address validation
+   * -------------------------------------------------------
+   */
+
+  if (
+    errorCode.includes("ADDRESS") ||
+    errorCode.includes("SHIPPING_ADDRESS") ||
+    serverMessage
+      .toLowerCase()
+      .includes("address")
+  ) {
+    return (
+      "We couldn't validate the shipping information provided. " +
+      "Please review your address and try again."
+    );
+  }
 
 
-      /*
-       * Safe generic client-side response.
-       *
-       * We intentionally do not display
-       * arbitrary backend error text here.
-       */
-      if (
-        status >= 400 &&
-        status < 500
-      ) {
-        return (
-          "We couldn't start checkout with the current cart. " +
-          "Please review your items and shipping information, then try again."
-        );
-      }
+  /*
+   * -------------------------------------------------------
+   * Other client-side checkout errors
+   * -------------------------------------------------------
+   */
+
+  if (status >= 400 && status < 500) {
+    return (
+      "Checkout could not be completed. " +
+      "Please review your information and try again."
+    );
+  }
 
 
-      return (
-        "Checkout could not be created. " +
-        "Your cart has been preserved so you can try again."
-      );
-    },
+  /*
+   * -------------------------------------------------------
+   * Safe fallback
+   * -------------------------------------------------------
+   */
+
+  return (
+    "Checkout could not be completed. " +
+    "Your cart has been preserved. Please try again."
+  );
+}
 
 
   start:
