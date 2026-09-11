@@ -1,7 +1,10 @@
 ---
 layout: default
 title: Payment Not Completed
+permalink: /checkout/failed/
 ---
+
+<meta name="referrer" content="no-referrer">
 
 <style>
   .checkout-failed {
@@ -16,6 +19,7 @@ title: Payment Not Completed
     border: 1px solid #e5e7eb;
     border-radius: 16px;
     text-align: center;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
   }
 
   .checkout-failed__icon {
@@ -26,8 +30,8 @@ title: Payment Not Completed
     height: 64px;
     margin: 0 auto 24px;
     border-radius: 50%;
-    background: #fef2f2;
-    color: #b91c1c;
+    background: #fff7ed;
+    color: #9a3412;
     font-size: 30px;
     font-weight: 700;
   }
@@ -62,6 +66,13 @@ title: Payment Not Completed
   .checkout-failed__note p {
     margin: 0;
     color: #6b7280;
+    line-height: 1.6;
+  }
+
+  .checkout-failed__reassurance {
+    margin-top: 18px;
+    color: #64748b;
+    font-size: 0.92rem;
     line-height: 1.6;
   }
 
@@ -128,10 +139,11 @@ title: Payment Not Completed
   <div class="checkout-failed__card">
 
     <div
+      id="checkout-failed-icon"
       class="checkout-failed__icon"
       aria-hidden="true"
     >
-      ×
+      !
     </div>
 
     <h1
@@ -145,21 +157,28 @@ title: Payment Not Completed
       id="checkout-failed-message"
       class="checkout-failed__lead"
     >
-      Your payment was not completed.
+      Your checkout did not complete.
       Your cart has been preserved so you can try again.
     </p>
 
     <div class="checkout-failed__note">
-      <h2>
+      <h2 id="checkout-failed-help-title">
         What should I do?
       </h2>
 
       <p id="checkout-failed-help">
-        Return to your cart, review your order,
-        and try checking out again. You may also
-        want to verify your payment details before retrying.
+        Return to the shop, review your cart,
+        and try checkout again when you're ready.
       </p>
     </div>
+
+    <p
+      id="checkout-failed-reassurance"
+      class="checkout-failed__reassurance"
+    >
+      If you are unsure whether your payment completed,
+      check your email for an order confirmation before trying again.
+    </p>
 
     <div class="checkout-failed__actions">
 
@@ -193,9 +212,19 @@ title: Payment Not Completed
   "use strict";
 
   /*
-   * Do NOT clear the cart here.
-   * The customer should be able
-   * to retry checkout.
+   * IMPORTANT:
+   *
+   * Do NOT clear the cart on this page.
+   *
+   * A customer who reaches this page may have:
+   *
+   * - had a payment declined,
+   * - canceled payment,
+   * - closed or interrupted checkout,
+   * - experienced a provider error,
+   * - or returned before payment was confirmed.
+   *
+   * Keeping the cart allows checkout to be retried.
    */
 
   const params =
@@ -204,7 +233,11 @@ title: Payment Not Completed
     );
 
   const reason =
-    params.get("reason");
+    String(
+      params.get("reason") || ""
+    )
+      .trim()
+      .toLowerCase();
 
   const title =
     document.getElementById(
@@ -216,47 +249,107 @@ title: Payment Not Completed
       "checkout-failed-message"
     );
 
+  const helpTitle =
+    document.getElementById(
+      "checkout-failed-help-title"
+    );
+
   const help =
     document.getElementById(
       "checkout-failed-help"
     );
 
+  const reassurance =
+    document.getElementById(
+      "checkout-failed-reassurance"
+    );
+
+  function showGenericFailure() {
+    title.textContent =
+      "Payment Not Completed";
+
+    message.textContent =
+      "Your checkout did not complete. Your cart has been preserved so you can try again.";
+
+    helpTitle.textContent =
+      "What should I do?";
+
+    help.textContent =
+      "Return to the shop, review your cart, and try checkout again when you're ready.";
+
+    reassurance.textContent =
+      "If you are unsure whether your payment completed, check your email for an order confirmation before trying again.";
+  }
+
+  function showDeclined() {
+    title.textContent =
+      "Payment Declined";
+
+    message.textContent =
+      "Your payment was declined and your checkout was not completed. Your cart has been preserved.";
+
+    helpTitle.textContent =
+      "Try another payment method";
+
+    help.textContent =
+      "Review your payment details or try another payment method, then begin checkout again.";
+
+    reassurance.textContent =
+      "No order confirmation was created from this unsuccessful payment attempt.";
+  }
+
+  function showCanceled() {
+    title.textContent =
+      "Payment Canceled";
+
+    message.textContent =
+      "The payment process was canceled before checkout was completed. Your cart has been preserved.";
+
+    helpTitle.textContent =
+      "You can try again anytime";
+
+    help.textContent =
+      "Return to the shop and begin checkout again whenever you're ready.";
+
+    reassurance.textContent =
+      "Nothing has been removed from your cart.";
+  }
+
+  function showTemporaryError() {
+    title.textContent =
+      "Checkout Could Not Be Completed";
+
+    message.textContent =
+      "Something interrupted checkout before we could confirm your payment. Your cart has been preserved.";
+
+    helpTitle.textContent =
+      "Please try again";
+
+    help.textContent =
+      "Wait a moment, then return to the shop and retry checkout. If the problem continues, try again later.";
+
+    reassurance.textContent =
+      "If you received an order confirmation email, do not submit another payment. Use the order-status link in that email instead.";
+  }
+
   switch (reason) {
     case "declined":
-      title.textContent =
-        "Payment Declined";
-
-      message.textContent =
-        "Your payment was declined and your order was not completed. Your cart has been preserved.";
-
-      help.textContent =
-        "Please review your payment details or try another payment method, then return to checkout.";
+      showDeclined();
       break;
 
     case "canceled":
     case "cancelled":
-      title.textContent =
-        "Payment Canceled";
-
-      message.textContent =
-        "You canceled the payment before it was completed. Your cart has been preserved.";
-
-      help.textContent =
-        "You can return to your cart whenever you're ready and try checkout again.";
+      showCanceled();
       break;
 
     case "error":
-      title.textContent =
-        "Checkout Could Not Be Completed";
-
-      message.textContent =
-        "We couldn't complete your checkout. Your cart has been preserved.";
-
-      help.textContent =
-        "Please wait a moment and try again. If the problem continues, you can return to the shop and retry checkout.";
+    case "interrupted":
+    case "unavailable":
+      showTemporaryError();
       break;
 
     default:
+      showGenericFailure();
       break;
   }
 })();

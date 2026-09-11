@@ -37,6 +37,22 @@ window.JekyllCommerceCheckout = {
 
       errorElement.hidden =
         false;
+
+      /*
+       * Bring the error into view,
+       * especially on mobile.
+       */
+      try {
+        errorElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      } catch (error) {
+        /*
+         * Older browsers may not
+         * support scrollIntoView options.
+         */
+      }
     },
 
 
@@ -225,6 +241,211 @@ window.JekyllCommerceCheckout = {
     },
 
 
+  getCheckoutErrorMessage:
+    function (
+      response,
+      data
+    ) {
+      const status =
+        Number(
+          response?.status || 0
+        );
+
+      const code =
+        String(
+          data?.code ||
+          data?.errorCode ||
+          data?.error ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+      const rawMessage =
+        String(
+          data?.message || ""
+        )
+          .trim();
+
+      const combined =
+        (
+          code +
+          " " +
+          rawMessage
+        )
+          .toLowerCase();
+
+
+      /*
+       * Unavailable product / variant.
+       *
+       * Supports both future structured
+       * error codes and the existing
+       * human-readable backend messages.
+       */
+      if (
+        combined.includes(
+          "unavailable"
+        ) ||
+        combined.includes(
+          "not available"
+        ) ||
+        combined.includes(
+          "unfulfillable"
+        ) ||
+        combined.includes(
+          "not fulfillable"
+        ) ||
+        combined.includes(
+          "variant_not_available"
+        ) ||
+        combined.includes(
+          "product_not_available"
+        ) ||
+        combined.includes(
+          "sku_not_available"
+        )
+      ) {
+        return (
+          "One or more items in your cart are no longer available. " +
+          "Please review your cart, remove or change the unavailable item, and try checkout again."
+        );
+      }
+
+
+      /*
+       * Unknown or invalid SKU/product.
+       *
+       * This can happen if the storefront
+       * is stale relative to the backend
+       * catalog.
+       */
+      if (
+        combined.includes(
+          "unknown sku"
+        ) ||
+        combined.includes(
+          "invalid sku"
+        ) ||
+        combined.includes(
+          "sku not found"
+        ) ||
+        combined.includes(
+          "unknown product"
+        ) ||
+        combined.includes(
+          "product not found"
+        )
+      ) {
+        return (
+          "One or more items in your cart could not be verified. " +
+          "Please remove the affected item and add it again from the shop."
+        );
+      }
+
+
+      /*
+       * Quantity validation.
+       */
+      if (
+        combined.includes(
+          "quantity"
+        ) &&
+        (
+          combined.includes(
+            "maximum"
+          ) ||
+          combined.includes(
+            "max"
+          ) ||
+          combined.includes(
+            "limit"
+          ) ||
+          combined.includes(
+            "invalid"
+          )
+        )
+      ) {
+        return (
+          "One or more cart quantities need to be adjusted before checkout. " +
+          "Please review your cart and try again."
+        );
+      }
+
+
+      /*
+       * Customer-address validation.
+       */
+      if (
+        status === 400 &&
+        (
+          combined.includes(
+            "address"
+          ) ||
+          combined.includes(
+            "postal"
+          ) ||
+          combined.includes(
+            "zip"
+          ) ||
+          combined.includes(
+            "shipping"
+          )
+        )
+      ) {
+        return (
+          "We couldn't verify the shipping information for this order. " +
+          "Please review your address and try again."
+        );
+      }
+
+
+      /*
+       * Rate limiting.
+       */
+      if (status === 429) {
+        return (
+          "Checkout is receiving a lot of requests right now. " +
+          "Please wait a moment and try again."
+        );
+      }
+
+
+      /*
+       * Server/provider outage.
+       */
+      if (status >= 500) {
+        return (
+          "Checkout is temporarily unavailable. " +
+          "Your cart has been preserved. Please wait a moment and try again."
+        );
+      }
+
+
+      /*
+       * Safe generic client-side response.
+       *
+       * We intentionally do not display
+       * arbitrary backend error text here.
+       */
+      if (
+        status >= 400 &&
+        status < 500
+      ) {
+        return (
+          "We couldn't start checkout with the current cart. " +
+          "Please review your items and shipping information, then try again."
+        );
+      }
+
+
+      return (
+        "Checkout could not be created. " +
+        "Your cart has been preserved so you can try again."
+      );
+    },
+
+
   start:
     async function (cart) {
       if (
@@ -289,6 +510,9 @@ window.JekyllCommerceCheckout = {
 
               headers: {
                 "Content-Type":
+                  "application/json",
+
+                "Accept":
                   "application/json"
               },
 
@@ -322,19 +546,42 @@ window.JekyllCommerceCheckout = {
           );
 
 
-        const data =
-          await response.json();
+        let data = {};
+
+        try {
+          data =
+            await response.json();
+        } catch (error) {
+          /*
+           * A Worker or upstream provider
+           * may occasionally return HTML,
+           * plain text, or an empty body.
+           */
+          data = {};
+        }
 
 
-		if (!response.ok) {
-		  throw new Error(
-			data.message ||
-			"Checkout could not be created."
-		  );
-		}
+        if (!response.ok) {
+          const checkoutError =
+            new Error(
+              this.getCheckoutErrorMessage(
+                response,
+                data
+              )
+            );
+
+          checkoutError.status =
+            response.status;
+
+          throw checkoutError;
+        }
+
 
         if (
-          data.checkoutUrl
+          data &&
+          typeof data.checkoutUrl ===
+            "string" &&
+          data.checkoutUrl.trim()
         ) {
           window.location.href =
             data.checkoutUrl;
@@ -344,7 +591,7 @@ window.JekyllCommerceCheckout = {
 
 
         throw new Error(
-          "Checkout URL was not returned."
+          "Checkout could not be started. Your cart has been preserved so you can try again."
         );
 
 
@@ -355,10 +602,23 @@ window.JekyllCommerceCheckout = {
         );
 
 
-        this.showError(
-          error.message ||
-          "Checkout is temporarily unavailable."
-        );
+        /*
+         * fetch() rejects for network-level
+         * problems such as offline state,
+         * DNS failure, or connection failure.
+         */
+        if (
+          !navigator.onLine
+        ) {
+          this.showError(
+            "You're offline. Reconnect to the internet and try checkout again."
+          );
+        } else {
+          this.showError(
+            error?.message ||
+            "Checkout is temporarily unavailable. Your cart has been preserved."
+          );
+        }
 
 
         if (button) {

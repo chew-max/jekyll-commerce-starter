@@ -4,6 +4,8 @@ title: Order Status
 permalink: /order-status/
 ---
 
+<meta name="referrer" content="no-referrer">
+
 <style>
   .order-status-page {
     max-width: 820px;
@@ -42,6 +44,14 @@ permalink: /order-status/
 
   .order-status-error h2 {
     margin-top: 0;
+  }
+
+  .order-status-error-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 22px;
   }
 
   .order-status-reference {
@@ -151,6 +161,11 @@ permalink: /order-status/
     font-weight: 700;
   }
 
+  .order-items-empty {
+    color: #64748b;
+    margin: 0;
+  }
+
   .order-totals-row {
     display: flex;
     justify-content: space-between;
@@ -188,11 +203,23 @@ permalink: /order-status/
     font-weight: 700;
     border: 0;
     cursor: pointer;
+    font: inherit;
   }
 
   .order-status-button:hover {
     opacity: 0.9;
     text-decoration: none;
+  }
+
+  .order-status-button.secondary {
+    background: #ffffff;
+    color: #111827 !important;
+    border: 1px solid #d1d5db;
+  }
+
+  .order-status-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .order-status-footer-actions {
@@ -223,6 +250,15 @@ permalink: /order-status/
       width: 30px;
       height: 30px;
     }
+
+    .order-status-error-actions {
+      flex-direction: column;
+    }
+
+    .order-status-error-actions .order-status-button {
+      width: 100%;
+      box-sizing: border-box;
+    }
   }
 </style>
 
@@ -239,7 +275,9 @@ permalink: /order-status/
     id="order-status-loading"
     class="order-status-card order-status-loading"
   >
-    <strong>Loading your order...</strong>
+    <strong id="order-status-loading-message">
+      Loading your order...
+    </strong>
   </div>
 
   <div
@@ -247,18 +285,31 @@ permalink: /order-status/
     class="order-status-card order-status-error"
     hidden
   >
-    <h2>We couldn't load this order.</h2>
+    <h2 id="order-status-error-title">
+      We couldn't load this order.
+    </h2>
 
     <p id="order-status-error-message">
       Please check your order link and try again.
     </p>
 
-    <a
-      href="{{ '/shop/' | relative_url }}"
-      class="order-status-button"
-    >
-      Return to Shop
-    </a>
+    <div class="order-status-error-actions">
+      <button
+        id="order-status-retry"
+        type="button"
+        class="order-status-button"
+        hidden
+      >
+        Try Again
+      </button>
+
+      <a
+        href="{{ '/shop/' | relative_url }}"
+        class="order-status-button secondary"
+      >
+        Return to Shop
+      </a>
+    </div>
   </div>
 
   <div
@@ -296,6 +347,7 @@ permalink: /order-status/
             data-progress-step="1"
           >
             <div class="order-progress-dot">1</div>
+
             <div class="order-progress-label">
               Payment
             </div>
@@ -306,6 +358,7 @@ permalink: /order-status/
             data-progress-step="2"
           >
             <div class="order-progress-dot">2</div>
+
             <div class="order-progress-label">
               Preparing
             </div>
@@ -316,6 +369,7 @@ permalink: /order-status/
             data-progress-step="3"
           >
             <div class="order-progress-dot">3</div>
+
             <div class="order-progress-label">
               Shipped
             </div>
@@ -326,6 +380,7 @@ permalink: /order-status/
             data-progress-step="4"
           >
             <div class="order-progress-dot">4</div>
+
             <div class="order-progress-label">
               Delivered
             </div>
@@ -436,9 +491,19 @@ permalink: /order-status/
       "order-status-loading"
     );
 
+  const loadingMessage =
+    document.getElementById(
+      "order-status-loading-message"
+    );
+
   const errorBox =
     document.getElementById(
       "order-status-error"
+    );
+
+  const errorTitle =
+    document.getElementById(
+      "order-status-error-title"
     );
 
   const errorMessage =
@@ -446,17 +511,32 @@ permalink: /order-status/
       "order-status-error-message"
     );
 
+  const retryButton =
+    document.getElementById(
+      "order-status-retry"
+    );
+
   const content =
     document.getElementById(
       "order-status-content"
     );
 
+  let requestInProgress =
+    false;
+
   function formatMoney(
     cents,
     currency
   ) {
+    const numericCents =
+      Number(cents);
+
     const amount =
-      Number(cents || 0) / 100;
+      Number.isFinite(
+        numericCents
+      )
+        ? numericCents / 100
+        : 0;
 
     try {
       return new Intl.NumberFormat(
@@ -490,14 +570,17 @@ permalink: /order-status/
       return "";
     }
 
+    const stringValue =
+      String(value);
+
     /*
-     * D1 timestamps are returned in
+     * D1 timestamps may be returned in
      * UTC without an explicit timezone.
      */
     const normalized =
-      value.includes("T")
-        ? value
-        : value.replace(
+      stringValue.includes("T")
+        ? stringValue
+        : stringValue.replace(
             " ",
             "T"
           ) + "Z";
@@ -626,7 +709,29 @@ permalink: /order-status/
 
     container.textContent = "";
 
-    (items || []).forEach(
+    if (
+      !Array.isArray(items) ||
+      items.length === 0
+    ) {
+      const emptyMessage =
+        document.createElement(
+          "p"
+        );
+
+      emptyMessage.className =
+        "order-items-empty";
+
+      emptyMessage.textContent =
+        "Item details are not available for this order.";
+
+      container.appendChild(
+        emptyMessage
+      );
+
+      return;
+    }
+
+    items.forEach(
       function (item) {
         const row =
           document.createElement(
@@ -650,16 +755,24 @@ permalink: /order-status/
           "order-item-name";
 
         name.textContent =
-          item.name ||
+          item?.name ||
           "Product";
 
         details.appendChild(
           name
         );
 
+        const itemOptions =
+          item &&
+          typeof item.options ===
+            "object" &&
+          item.options !== null
+            ? item.options
+            : {};
+
         const options =
           Object.entries(
-            item.options || {}
+            itemOptions
           );
 
         if (options.length) {
@@ -680,7 +793,9 @@ permalink: /order-status/
                       entry[0]
                     ) +
                     ": " +
-                    entry[1]
+                    String(
+                      entry[1]
+                    )
                   );
                 }
               )
@@ -690,6 +805,14 @@ permalink: /order-status/
             optionsElement
           );
         }
+
+        const quantityValue =
+          Math.max(
+            0,
+            Number(
+              item?.quantity || 0
+            )
+          );
 
         const quantity =
           document.createElement(
@@ -701,9 +824,7 @@ permalink: /order-status/
 
         quantity.textContent =
           "Qty: " +
-          Number(
-            item.quantity || 0
-          );
+          quantityValue;
 
         details.appendChild(
           quantity
@@ -720,11 +841,9 @@ permalink: /order-status/
         price.textContent =
           formatMoney(
             Number(
-              item.unitPrice || 0
+              item?.unitPrice || 0
             ) *
-              Number(
-                item.quantity || 0
-              ),
+              quantityValue,
             currency
           );
 
@@ -743,10 +862,62 @@ permalink: /order-status/
     );
   }
 
+  function resetTracking() {
+    const card =
+      document.getElementById(
+        "tracking-card"
+      );
+
+    const carrierRow =
+      document.getElementById(
+        "tracking-carrier-row"
+      );
+
+    const numberRow =
+      document.getElementById(
+        "tracking-number-row"
+      );
+
+    const link =
+      document.getElementById(
+        "tracking-link"
+      );
+
+    card.style.display =
+      "none";
+
+    carrierRow.hidden =
+      true;
+
+    numberRow.hidden =
+      true;
+
+    link.hidden =
+      true;
+
+    link.removeAttribute(
+      "href"
+    );
+
+    document.getElementById(
+      "tracking-carrier"
+    ).textContent = "";
+
+    document.getElementById(
+      "tracking-number"
+    ).textContent = "";
+  }
+
   function renderTracking(
     tracking
   ) {
-    if (!tracking) {
+    resetTracking();
+
+    if (
+      !tracking ||
+      typeof tracking !==
+        "object"
+    ) {
       return;
     }
 
@@ -771,22 +942,28 @@ permalink: /order-status/
       document.getElementById(
         "tracking-carrier"
       ).textContent =
-        tracking.carrier;
+        String(
+          tracking.carrier
+        );
 
       document.getElementById(
         "tracking-carrier-row"
-      ).hidden = false;
+      ).hidden =
+        false;
     }
 
     if (tracking.number) {
       document.getElementById(
         "tracking-number"
       ).textContent =
-        tracking.number;
+        String(
+          tracking.number
+        );
 
       document.getElementById(
         "tracking-number-row"
-      ).hidden = false;
+      ).hidden =
+        false;
     }
 
     if (tracking.url) {
@@ -795,19 +972,47 @@ permalink: /order-status/
           "tracking-link"
         );
 
-      link.href =
-        tracking.url;
+      try {
+        const url =
+          new URL(
+            tracking.url
+          );
 
-      link.hidden =
-        false;
+        if (
+          url.protocol === "https:" ||
+          url.protocol === "http:"
+        ) {
+          link.href =
+            url.href;
+
+          link.hidden =
+            false;
+        }
+      } catch (error) {
+        console.warn(
+          "INVALID TRACKING URL",
+          error
+        );
+      }
     }
   }
 
   function renderOrder(order) {
+    if (
+      !order ||
+      typeof order !==
+        "object"
+    ) {
+      throw new Error(
+        "Order response was invalid."
+      );
+    }
+
     document.getElementById(
       "order-reference"
     ).textContent =
-      order.orderReference || "";
+      order.orderReference ||
+      "";
 
     const customerStatus =
       getCustomerStatus(
@@ -834,16 +1039,26 @@ permalink: /order-status/
         order.dates?.created
       );
 
-    if (createdDate) {
+    const dateElement =
       document.getElementById(
         "order-created-date"
-      ).textContent =
-        "Order placed " +
-        createdDate;
-    }
+      );
+
+    dateElement.textContent =
+      createdDate
+        ? "Order placed " +
+          createdDate
+        : "";
+
+    const totals =
+      order.totals &&
+      typeof order.totals ===
+        "object"
+        ? order.totals
+        : {};
 
     const currency =
-      order.totals?.currency ||
+      totals.currency ||
       "USD";
 
     renderItems(
@@ -855,8 +1070,7 @@ permalink: /order-status/
       "total-merchandise"
     ).textContent =
       formatMoney(
-        order.totals
-          ?.merchandise,
+        totals.merchandise,
         currency
       );
 
@@ -864,8 +1078,7 @@ permalink: /order-status/
       "total-shipping"
     ).textContent =
       formatMoney(
-        order.totals
-          ?.shipping,
+        totals.shipping,
         currency
       );
 
@@ -873,7 +1086,7 @@ permalink: /order-status/
       "total-tax"
     ).textContent =
       formatMoney(
-        order.totals?.tax,
+        totals.tax,
         currency
       );
 
@@ -881,7 +1094,7 @@ permalink: /order-status/
       "total-order"
     ).textContent =
       formatMoney(
-        order.totals?.total,
+        totals.total,
         currency
       );
 
@@ -892,77 +1105,294 @@ permalink: /order-status/
     loading.hidden =
       true;
 
+    errorBox.hidden =
+      true;
+
     content.hidden =
       false;
   }
 
-  function showError(message) {
+  function showLoading(message) {
+    content.hidden =
+      true;
+
+    errorBox.hidden =
+      true;
+
+    loadingMessage.textContent =
+      message ||
+      "Loading your order...";
+
+    loading.hidden =
+      false;
+  }
+
+  function showError(options) {
+    const config =
+      options || {};
+
     loading.hidden =
       true;
 
     content.hidden =
       true;
 
+    errorTitle.textContent =
+      config.title ||
+      "We couldn't load this order.";
+
     errorMessage.textContent =
-      message ||
+      config.message ||
       "Please check your order link and try again.";
+
+    retryButton.hidden =
+      !config.retryable;
+
+    retryButton.disabled =
+      false;
 
     errorBox.hidden =
       false;
   }
 
-  if (!token) {
-    showError(
-      "This order status link is incomplete."
-    );
+  function createStatusError(
+    type,
+    status,
+    message
+  ) {
+    const error =
+      new Error(
+        message ||
+        "Order status could not be loaded."
+      );
 
-    return;
+    error.type =
+      type;
+
+    error.status =
+      status || 0;
+
+    return error;
   }
 
-  fetch(
-    API_BASE +
-      "/api/order-status?token=" +
-      encodeURIComponent(token),
-    {
-      method: "GET",
-      headers: {
-        "Accept":
-          "application/json"
-      },
-      cache: "no-store",
-      referrerPolicy:
-        "no-referrer"
+  function loadOrderStatus() {
+    if (requestInProgress) {
+      return;
     }
-  )
-    .then(function (response) {
-      return response
-        .json()
-        .catch(function () {
-          return {};
-        })
-        .then(function (data) {
-          if (!response.ok) {
-            throw new Error(
-              data.message ||
-              "Order status could not be loaded."
+
+    if (!token) {
+      showError({
+        title:
+          "This order link is incomplete.",
+        message:
+          "Use the order-status link from your confirmation email to view your order.",
+        retryable:
+          false
+      });
+
+      return;
+    }
+
+    requestInProgress =
+      true;
+
+    retryButton.disabled =
+      true;
+
+    showLoading(
+      "Loading your order..."
+    );
+
+    fetch(
+      API_BASE +
+        "/api/order-status?token=" +
+        encodeURIComponent(
+          token
+        ),
+      {
+        method:
+          "GET",
+
+        headers: {
+          "Accept":
+            "application/json"
+        },
+
+        cache:
+          "no-store",
+
+        referrerPolicy:
+          "no-referrer"
+      }
+    )
+      .then(
+        function (response) {
+          return response
+            .json()
+            .catch(
+              function () {
+                return {};
+              }
+            )
+            .then(
+              function (data) {
+                if (response.ok) {
+                  return data;
+                }
+
+                if (
+                  response.status === 401 ||
+                  response.status === 403 ||
+                  response.status === 404
+                ) {
+                  throw createStatusError(
+                    "invalid-link",
+                    response.status,
+                    data.message
+                  );
+                }
+
+                if (
+                  response.status === 429
+                ) {
+                  throw createStatusError(
+                    "temporary",
+                    response.status,
+                    data.message
+                  );
+                }
+
+                if (
+                  response.status >= 500
+                ) {
+                  throw createStatusError(
+                    "temporary",
+                    response.status,
+                    data.message
+                  );
+                }
+
+                throw createStatusError(
+                  "request",
+                  response.status,
+                  data.message
+                );
+              }
             );
+        }
+      )
+      .then(
+        function (order) {
+          renderOrder(
+            order
+          );
+        }
+      )
+      .catch(
+        function (error) {
+          console.error(
+            "ORDER STATUS PAGE ERROR",
+            {
+              type:
+                error?.type ||
+                "network",
+              status:
+                error?.status ||
+                0,
+              message:
+                error?.message ||
+                String(error)
+            }
+          );
+
+          if (
+            error?.type ===
+              "invalid-link"
+          ) {
+            showError({
+              title:
+                "This order link isn't valid.",
+              message:
+                "The order-status link may be incomplete or no longer available. Please use the link from your order confirmation email.",
+              retryable:
+                false
+            });
+
+            return;
           }
 
-          return data;
-        });
-    })
-    .then(function (order) {
-      renderOrder(order);
-    })
-    .catch(function (error) {
-      console.error(
-        "ORDER STATUS PAGE ERROR",
-        error
-      );
+          if (
+            error?.type ===
+              "temporary"
+          ) {
+            showError({
+              title:
+                "Order status is temporarily unavailable.",
+              message:
+                "We're having trouble loading your order right now. Your order has not been affected. Please try again in a moment.",
+              retryable:
+                true
+            });
 
-      showError(
-        "We couldn't load your order status. Please try again."
+            return;
+          }
+
+          if (
+            !navigator.onLine
+          ) {
+            showError({
+              title:
+                "You're offline.",
+              message:
+                "Reconnect to the internet and try loading your order again.",
+              retryable:
+                true
+            });
+
+            return;
+          }
+
+          showError({
+            title:
+              "We couldn't load your order.",
+            message:
+              "Something interrupted the request. Please try again.",
+            retryable:
+              true
+          });
+        }
+      )
+      .finally(
+        function () {
+          requestInProgress =
+            false;
+
+          retryButton.disabled =
+            false;
+        }
       );
-    });
+  }
+
+  retryButton.addEventListener(
+    "click",
+    function () {
+      loadOrderStatus();
+    }
+  );
+
+  window.addEventListener(
+    "online",
+    function () {
+      if (
+        !errorBox.hidden &&
+        !retryButton.hidden
+      ) {
+        retryButton.disabled =
+          false;
+      }
+    }
+  );
+
+  loadOrderStatus();
 })();
 </script>
