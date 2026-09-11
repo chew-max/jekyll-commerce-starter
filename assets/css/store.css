@@ -1245,6 +1245,18 @@ body.cart-open {
   border-color: #111111;
 }
 
+.product-option-value.is-unavailable,
+.product-option-value:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.product-option-value.is-unavailable:hover,
+.product-option-value:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
 
 /* ---------------------------------------------------------
    Quantity

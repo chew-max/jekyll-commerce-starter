@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
-   /* =======================================================
+     /* =======================================================
      Product Variants
      ======================================================= */
 
@@ -249,7 +249,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  function getVariantKey() {
+  function getVariantKey(
+    options = selectedOptions
+  ) {
     if (
       !commerceProduct ||
       !Array.isArray(
@@ -262,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return commerceProduct.option_names
       .map(function (optionName) {
         return (
-          selectedOptions[
+          options[
             optionName
           ] || ""
         );
@@ -320,6 +322,139 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
+  function variantMatchesOptions(
+    variant,
+    options
+  ) {
+    const variantOptions =
+      variant.options || {};
+
+    return Object.keys(
+      options
+    ).every(
+      function (optionName) {
+        return (
+          String(
+            variantOptions[
+              optionName
+            ] ?? ""
+          ) ===
+          String(
+            options[
+              optionName
+            ] ?? ""
+          )
+        );
+      }
+    );
+  }
+
+
+  function optionValueCanProduceAvailableVariant(
+    optionName,
+    optionValue
+  ) {
+    if (
+      !commerceProduct ||
+      !Array.isArray(
+        commerceProduct.variants
+      )
+    ) {
+      return false;
+    }
+
+    const candidateOptions = {
+      ...selectedOptions,
+      [optionName]:
+        optionValue
+    };
+
+    return commerceProduct.variants
+      .some(
+        function (variant) {
+          return (
+            variant.available ===
+              true &&
+            variantMatchesOptions(
+              variant,
+              candidateOptions
+            )
+          );
+        }
+      );
+  }
+
+
+  function updateOptionAvailability() {
+    optionButtons.forEach(
+      function (button) {
+        const optionName =
+          button.getAttribute(
+            "data-option"
+          );
+
+        const optionValue =
+          button.getAttribute(
+            "data-value"
+          );
+
+        if (
+          !optionName ||
+          !optionValue
+        ) {
+          return;
+        }
+
+        /*
+         * When evaluating a button, ignore the
+         * currently selected value for that same
+         * option. This lets the customer switch
+         * between valid values instead of the
+         * current selection locking the group.
+         */
+        const previousValue =
+          selectedOptions[
+            optionName
+          ];
+
+        delete selectedOptions[
+          optionName
+        ];
+
+        const available =
+          optionValueCanProduceAvailableVariant(
+            optionName,
+            optionValue
+          );
+
+        if (
+          previousValue !==
+          undefined
+        ) {
+          selectedOptions[
+            optionName
+          ] = previousValue;
+        }
+
+        button.disabled =
+          !available;
+
+        button.classList.toggle(
+          "is-unavailable",
+          !available
+        );
+
+        button.setAttribute(
+          "aria-disabled",
+          available
+            ? "false"
+            : "true"
+        );
+      }
+    );
+  }
+
+
   function updateVariantPrice() {
     if (!currentPrice) {
       return;
@@ -350,6 +485,15 @@ document.addEventListener("DOMContentLoaded", function () {
       button.addEventListener(
         "click",
         function () {
+
+          if (
+            button.disabled ||
+            button.classList.contains(
+              "is-unavailable"
+            )
+          ) {
+            return;
+          }
 
           const optionName =
             button.getAttribute(
@@ -403,6 +547,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
 
+          updateOptionAvailability();
           updateVariantPrice();
 
         }
@@ -412,6 +557,7 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
 
+  updateOptionAvailability();
   updateVariantPrice();
   /* =======================================================
      Product Quantity
@@ -526,7 +672,10 @@ document.addEventListener("DOMContentLoaded", function () {
           getSelectedVariant();
 
 
-        if (!selectedVariant) {
+        if (
+		  !selectedVariant ||
+		  selectedVariant.available !== true
+		) {
 
           if (productMessage) {
 
