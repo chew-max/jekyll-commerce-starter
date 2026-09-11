@@ -3,20 +3,261 @@ layout: default
 title: Payment Not Completed
 ---
 
-<section class="checkout-result">
-  <div class="container">
-    <h1>Payment Not Completed</h1>
+<style>
+  .checkout-failed {
+    padding: 64px 20px;
+  }
 
-    <p>
+  .checkout-failed__card {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .checkout-failed__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  .checkout-failed__title {
+    margin: 0 0 12px;
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .checkout-failed__lead {
+    max-width: 560px;
+    margin: 0 auto;
+    color: #4b5563;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  .checkout-failed__note {
+    margin-top: 32px;
+    padding: 24px;
+    background: #f9fafb;
+    border-radius: 12px;
+    text-align: left;
+  }
+
+  .checkout-failed__note h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+  }
+
+  .checkout-failed__note p {
+    margin: 0;
+    color: #6b7280;
+    line-height: 1.6;
+  }
+
+  .checkout-failed__actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .checkout-failed__button {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .checkout-failed__button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  .checkout-failed__button--primary {
+    background: #111827;
+    color: #ffffff !important;
+  }
+
+  .checkout-failed__button--secondary {
+    background: #f3f4f6;
+    color: #111827 !important;
+  }
+
+  @media (max-width: 600px) {
+    .checkout-failed {
+      padding: 40px 16px;
+    }
+
+    .checkout-failed__card {
+      padding: 36px 22px;
+    }
+
+    .checkout-failed__title {
+      font-size: 28px;
+    }
+
+    .checkout-failed__actions {
+      flex-direction: column;
+    }
+
+    .checkout-failed__button {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+</style>
+
+<section class="checkout-failed">
+  <div class="checkout-failed__card">
+
+    <div
+      class="checkout-failed__icon"
+      aria-hidden="true"
+    >
+      ×
+    </div>
+
+    <h1
+      id="checkout-failed-title"
+      class="checkout-failed__title"
+    >
+      Payment Not Completed
+    </h1>
+
+    <p
+      id="checkout-failed-message"
+      class="checkout-failed__lead"
+    >
       Your payment was not completed.
       Your cart has been preserved so you can try again.
     </p>
 
-    <a
-      class="button"
-      href="{{ '/shop/' | relative_url }}"
-    >
-      Return to Shop
-    </a>
+    <div class="checkout-failed__note">
+      <h2>
+        What should I do?
+      </h2>
+
+      <p id="checkout-failed-help">
+        Return to your cart, review your order,
+        and try checking out again. You may also
+        want to verify your payment details before retrying.
+      </p>
+    </div>
+
+    <div class="checkout-failed__actions">
+
+      <a
+        class="
+          checkout-failed__button
+          checkout-failed__button--primary
+        "
+        href="{{ '/shop/' | relative_url }}"
+      >
+        Return to Shop
+      </a>
+
+      <a
+        class="
+          checkout-failed__button
+          checkout-failed__button--secondary
+        "
+        href="{{ '/' | relative_url }}"
+      >
+        Home
+      </a>
+
+    </div>
+
   </div>
 </section>
+
+<script>
+(function () {
+  "use strict";
+
+  /*
+   * Do NOT clear the cart here.
+   * The customer should be able
+   * to retry checkout.
+   */
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const reason =
+    params.get("reason");
+
+  const title =
+    document.getElementById(
+      "checkout-failed-title"
+    );
+
+  const message =
+    document.getElementById(
+      "checkout-failed-message"
+    );
+
+  const help =
+    document.getElementById(
+      "checkout-failed-help"
+    );
+
+  switch (reason) {
+    case "declined":
+      title.textContent =
+        "Payment Declined";
+
+      message.textContent =
+        "Your payment was declined and your order was not completed. Your cart has been preserved.";
+
+      help.textContent =
+        "Please review your payment details or try another payment method, then return to checkout.";
+      break;
+
+    case "canceled":
+    case "cancelled":
+      title.textContent =
+        "Payment Canceled";
+
+      message.textContent =
+        "You canceled the payment before it was completed. Your cart has been preserved.";
+
+      help.textContent =
+        "You can return to your cart whenever you're ready and try checkout again.";
+      break;
+
+    case "error":
+      title.textContent =
+        "Checkout Could Not Be Completed";
+
+      message.textContent =
+        "We couldn't complete your checkout. Your cart has been preserved.";
+
+      help.textContent =
+        "Please wait a moment and try again. If the problem continues, you can return to the shop and retry checkout.";
+      break;
+
+    default:
+      break;
+  }
+})();
+</script>
