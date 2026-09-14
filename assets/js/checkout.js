@@ -241,7 +241,7 @@ window.JekyllCommerceCheckout = {
     },
 
 
-function getCheckoutErrorMessage(response, data) {
+getCheckoutErrorMessage(response, data) {
   const status =
     Number(response?.status) || 0;
 
@@ -394,7 +394,7 @@ function getCheckoutErrorMessage(response, data) {
     "Checkout could not be completed. " +
     "Your cart has been preserved. Please try again."
   );
-}
+},
 
 
   start:
