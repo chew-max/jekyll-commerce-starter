@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   const CART_STORAGE_KEY = "jekyllCommerceCart";
+  const MAX_QUANTITY =
+  Number(
+    window.JekyllCommerceConfig?.maxQuantity
+  ) || 10;
 
   /* =======================================================
      Helpers
@@ -604,10 +608,10 @@ document.addEventListener("DOMContentLoaded", function () {
         let quantity =
           parseInt(quantityInput.value, 10) || 1;
 
-        quantity = Math.min(
-          10,
-          quantity + 1
-        );
+		quantity = Math.min(
+		  MAX_QUANTITY,
+		  quantity + 1
+		);
 
         quantityInput.value = quantity;
 
@@ -729,12 +733,18 @@ document.addEventListener("DOMContentLoaded", function () {
             selectedOptions.size ||
             null,
 
-          quantity:
-            parseInt(
-              quantityInput?.value ||
-              "1",
-              10
-            )
+		quantity:
+		  Math.min(
+			MAX_QUANTITY,
+			Math.max(
+			  1,
+			  parseInt(
+				quantityInput?.value ||
+				"1",
+				10
+			  ) || 1
+			)
+		  )
 
         };
 

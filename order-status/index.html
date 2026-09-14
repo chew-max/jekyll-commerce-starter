@@ -6,6 +6,7 @@ permalink: /order-status/
 
 <meta name="referrer" content="no-referrer">
 
+
 <style>
   .order-status-page {
     max-width: 820px;
@@ -475,8 +476,11 @@ permalink: /order-status/
 (function () {
   "use strict";
 
-  const API_BASE =
-    "https://jekyll-commerce-api.mth-commerce.workers.dev";
+const ORDER_STATUS_ENDPOINT =
+  {{ site.data.store.commerce.order_status_endpoint | jsonify }};
+  
+const STORE_CURRENCY =
+  {{ site.data.store.store.currency | jsonify }};
 
   const params =
     new URLSearchParams(
@@ -544,7 +548,7 @@ permalink: /order-status/
         {
           style: "currency",
           currency:
-            currency || "USD"
+            currency || STORE_CURRENCY
         }
       ).format(amount);
     } catch (error) {
@@ -1058,8 +1062,8 @@ permalink: /order-status/
         : {};
 
     const currency =
-      totals.currency ||
-      "USD";
+	  totals.currency ||
+	  STORE_CURRENCY;
 
     renderItems(
       order.items,
@@ -1203,12 +1207,12 @@ permalink: /order-status/
       "Loading your order..."
     );
 
-    fetch(
-      API_BASE +
-        "/api/order-status?token=" +
-        encodeURIComponent(
-          token
-        ),
+	fetch(
+	  ORDER_STATUS_ENDPOINT +
+		"?token=" +
+		encodeURIComponent(
+		  token
+		),
       {
         method:
           "GET",
