@@ -772,10 +772,14 @@ document.addEventListener("DOMContentLoaded", function () {
           );
 
 
-        if (existingItem) {
+		if (existingItem) {
 
-          existingItem.quantity +=
-            product.quantity;
+		  existingItem.quantity =
+			Math.min(
+			  MAX_QUANTITY,
+			  existingItem.quantity +
+				product.quantity
+			);
 
           existingItem.title =
             product.title;
@@ -1040,7 +1044,11 @@ document.addEventListener("DOMContentLoaded", function () {
           const updatedCart =
             getCart();
 
-          updatedCart[index].quantity += 1;
+          updatedCart[index].quantity =
+		  Math.min(
+			MAX_QUANTITY,
+			updatedCart[index].quantity + 1
+		  );
 
           saveCart(updatedCart);
 
