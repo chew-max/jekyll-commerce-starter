@@ -1,7 +1,15 @@
-title: Jekyll Commerce Starter
-description: Reusable Jekyll ecommerce storefront
+# =========================================================
+# STORE SEO
+# Update these values when cloning the storefront.
+# =========================================================
+
+title: "Jekyll Commerce"
+description: "A modern storefront built with Jekyll"
+
 url: "https://chew-max.github.io"
 baseurl: "/jekyll-commerce-starter"
+
+logo: "/assets/images/logo.svg"
 
 markdown: kramdown
 permalink: pretty
@@ -17,6 +25,8 @@ defaults:
       type: products
     values:
       layout: product
+      seo:
+        type: Product
 
 plugins:
   - jekyll-feed

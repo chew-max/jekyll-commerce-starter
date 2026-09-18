@@ -31,48 +31,78 @@
           </li>
         </ul>
       </div>
+	  
+{% assign has_social = false %}
 
-      <div class="site-footer__column">
-        <h3>Follow</h3>
+{% if site.data.store.social.instagram != "" %}
+  {% assign has_social = true %}
+{% endif %}
 
-        <ul>
-          {% if site.data.store.social.instagram != "" %}
-            <li>
-              <a
-                href="{{ site.data.store.social.instagram }}"
-                target="_blank"
-                rel="noopener"
-              >
-                Instagram
-              </a>
-            </li>
-          {% endif %}
+{% if site.data.store.social.facebook != "" %}
+  {% assign has_social = true %}
+{% endif %}
 
-          {% if site.data.store.social.facebook != "" %}
-            <li>
-              <a
-                href="{{ site.data.store.social.facebook }}"
-                target="_blank"
-                rel="noopener"
-              >
-                Facebook
-              </a>
-            </li>
-          {% endif %}
+{% if site.data.store.social.tiktok != "" %}
+  {% assign has_social = true %}
+{% endif %}
 
-          {% if site.data.store.social.tiktok != "" %}
-            <li>
-              <a
-                href="{{ site.data.store.social.tiktok }}"
-                target="_blank"
-                rel="noopener"
-              >
-                TikTok
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
+
+{% if has_social %}
+
+  <nav
+    class="site-footer__social"
+    aria-label="Social media"
+  >
+
+    {% if site.data.store.social.instagram != "" %}
+      <a
+        href="{{ site.data.store.social.instagram }}"
+        target="_blank"
+        rel="noopener"
+      >
+        Instagram
+      </a>
+    {% endif %}
+
+    {% if site.data.store.social.facebook != "" %}
+      <a
+        href="{{ site.data.store.social.facebook }}"
+        target="_blank"
+        rel="noopener"
+      >
+        Facebook
+      </a>
+    {% endif %}
+
+    {% if site.data.store.social.tiktok != "" %}
+      <a
+        href="{{ site.data.store.social.tiktok }}"
+        target="_blank"
+        rel="noopener"
+      >
+        TikTok
+      </a>
+    {% endif %}
+
+  </nav>
+
+{% endif %}
+
+<div class="site-footer__column">
+  <h3>Policies</h3>
+
+  <ul>
+    {% for policy in site.data.store.policies %}
+      {% if policy.enabled %}
+        <li>
+          <a href="{{ '/policies/' | append: policy.handle | append: '/' | relative_url }}">
+            {{ policy.title }}
+          </a>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</div>
 
     </div>
 

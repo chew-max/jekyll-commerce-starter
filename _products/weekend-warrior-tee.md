@@ -11,7 +11,11 @@ compare_at_price: 29.99
 featured: true
 badge: "Best Seller"
 
-collection: diy
+collections:
+  - shirts
+  - best-sellers
+
+image: /assets/images/products/weekend-warrior/front.png
 
 images:
   - /assets/images/products/weekend-warrior/front.png
@@ -24,4 +28,9 @@ short_description: >
 description: >
   The Weekend Warrior Tee is designed for the person
   who somehow turns every Saturday into a home improvement mission.
+  
+  
+seo_description: >
+  A clean everyday tee built for weekend projects,
+  honey-do lists, and getting the job done.
 ---

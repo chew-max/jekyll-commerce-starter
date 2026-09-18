@@ -29,6 +29,131 @@ document.addEventListener("DOMContentLoaded", function () {
       return [];
     }
   }
+  
+  /* =======================================================
+   Checkout Page
+   ======================================================= */
+
+const checkoutSubmit =
+  document.querySelector("#checkout-submit");
+
+const checkoutSummaryItems =
+  document.querySelector("#checkout-summary-items");
+
+const checkoutSummarySubtotal =
+  document.querySelector("#checkout-summary-subtotal");
+
+
+function renderCheckoutSummary() {
+  if (
+    !checkoutSummaryItems ||
+    !checkoutSummarySubtotal
+  ) {
+    return;
+  }
+
+  const cart = getCart();
+
+  if (cart.length === 0) {
+    checkoutSummaryItems.innerHTML =
+      '<p class="checkout-summary__empty">Your cart is empty.</p>';
+
+    checkoutSummarySubtotal.textContent =
+      "$0.00";
+
+    if (checkoutSubmit) {
+      checkoutSubmit.disabled = true;
+    }
+
+    return;
+  }
+
+  let subtotal = 0;
+
+  checkoutSummaryItems.innerHTML =
+    cart.map(function (item) {
+      const quantity =
+        Number(item.quantity) || 0;
+
+      const price =
+        Number(item.price) || 0;
+
+      subtotal +=
+        price * quantity;
+
+return `
+  <div class="checkout-summary-item">
+
+    <a
+      href="${item.url || "#"}"
+      class="checkout-summary-item__image"
+      aria-label="${item.title || "View product"}"
+    >
+      <img
+        src="${item.image || ""}"
+        alt="${item.title || "Product"}"
+      >
+    </a>
+
+    <div class="checkout-summary-item__details">
+
+      <a
+        href="${item.url || "#"}"
+        class="checkout-summary-item__title"
+      >
+        ${item.title || "Product"}
+      </a>
+
+      <span>
+        ${item.options?.color || item.color || ""}
+        ${
+          (item.options?.color || item.color) &&
+          (item.options?.size || item.size)
+            ? " / "
+            : ""
+        }
+        ${item.options?.size || item.size || ""}
+      </span>
+
+      <span>
+        Qty: ${quantity}
+      </span>
+
+    </div>
+
+    <strong class="checkout-summary-item__price">
+      ${formatMoney(price * quantity)}
+    </strong>
+
+  </div>
+`;
+    }).join("");
+
+  checkoutSummarySubtotal.textContent =
+    formatMoney(subtotal);
+}
+
+
+if (checkoutSubmit) {
+  renderCheckoutSummary();
+
+  checkoutSubmit.addEventListener(
+    "click",
+    function () {
+      const cart = getCart();
+
+      if (
+        window.JekyllCommerceCheckout &&
+        typeof window.JekyllCommerceCheckout.start ===
+          "function"
+      ) {
+        window.JekyllCommerceCheckout.start(
+          cart
+        );
+      }
+    }
+  );
+}
 
 
   function saveCart(cart) {
@@ -1142,51 +1267,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
   }
-
-
-  /* =======================================================
-     Checkout Placeholder
-     ======================================================= */
-
-  const checkoutButton =
-    document.querySelector("#checkout-button");
-
-	checkoutButton?.addEventListener(
-	  "click",
-	  function () {
-
-		const cart = getCart();
-
-		if (
-		  window.JekyllCommerceCheckout &&
-		  typeof window.JekyllCommerceCheckout.start === "function"
-		) {
-		  const checkoutEmail =
-		document.querySelector("#checkout-email");
-
-		const email =
-		  checkoutEmail?.value.trim() || "";
-
-		if (!email) {
-		  alert("Please enter your email.");
-		  checkoutEmail?.focus();
-		  return;
-		}
-
-		if (!checkoutEmail.checkValidity()) {
-		  alert("Please enter a valid email address.");
-		  checkoutEmail.focus();
-		  return;
-		}
-
-		window.JekyllCommerceCheckout.start(
-		  cart
-		);
-		}
-
-	  }
-	);
-
 
   /* =======================================================
      Initial Render
