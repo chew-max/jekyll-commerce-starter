@@ -2257,7 +2257,7 @@ body.cart-open {
 }
 
 .collection-page__header {
-  max-width: 680px;
+  width: 100%;
 
   margin-bottom: 50px;
 }
@@ -2274,6 +2274,7 @@ body.cart-open {
 }
 
 .collection-page__header h1 {
+  max-width: 900px;
   margin: 0 0 18px;
 
   font-size: clamp(3rem, 5vw, 4.75rem);
@@ -2295,7 +2296,19 @@ body.cart-open {
   line-height: 1.7;
 }
 
+.collection-page__banner {
+  width: min(100%, 1200px);
+  margin-top: 32px;
+  overflow: hidden;
+  border-radius: 4px;
+}
 
+.collection-page__banner img {
+  display: block;
+  width: 100%;
+  height: clamp(220px, 30vw, 400px);
+  object-fit: cover;
+}
 /* Collection product wrapper must not alter
    the existing product-card layout. */
 
@@ -2365,7 +2378,13 @@ body.cart-open {
   .shop-collections__link.is-active::after {
     bottom: -17px;
   }
+  .collection-page__banner {
+    margin-top: 24px;
+  }
 
+  .collection-page__banner img {
+    height: 240px;
+  }
 }
 
 
@@ -2382,10 +2401,12 @@ body.cart-open {
   .collection-page__header h1 {
     font-size: 2.75rem;
   }
-
+  .collection-page__banner img {
+    height: 190px;
+  }
 }
 /* =========================================================
-   PHASE 13.6 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â MOBILE STOREFRONT POLISH
+   PHASE 13.6  MOBILE STOREFRONT POLISH
    ========================================================= */
 
 @media (max-width: 600px) {
